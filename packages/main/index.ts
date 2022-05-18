@@ -1,6 +1,7 @@
 import { app, BrowserWindow, shell } from 'electron'
 import { release } from 'os'
 import { join } from 'path'
+const server = require('NeteaseCloudMusicApi/server')
 
 // Disable GPU Acceleration for Windows 7
 if (release().startsWith('6.1')) app.disableHardwareAcceleration()
@@ -18,7 +19,12 @@ let win: BrowserWindow | null = null
 
 async function createWindow() {
   win = new BrowserWindow({
-    title: 'Main window',
+    Width: 1080,
+    Height: 720,
+    minWidth: 1080,
+    minHeight: 720,
+    frame: !(process.platform === 'win32'),
+    title: 'zPlayer',
     webPreferences: {
       preload: join(__dirname, '../preload/index.cjs'),
       nodeIntegration: true,
@@ -69,5 +75,15 @@ app.on('activate', () => {
     allWindows[0].focus()
   } else {
     createWindow()
+
   }
+})
+
+app.on('ready',()=>{
+  //ncmapi
+  server.serveNcmApi({
+    port: 1115,
+  }).then((res:any)=>{
+    const neteaseMusicAPI=res
+  })
 })
