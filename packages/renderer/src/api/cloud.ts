@@ -16,9 +16,7 @@ export function uploadSong(file:File) {
             'Content-Type': 'multipart/form-data',
         },
         timeout: 200000,
-    }).catch(error => {
-        alert(`上传失败，Error: ${error}`);
-    });
+    })
 }
 
 /**
@@ -30,7 +28,7 @@ export function uploadSong(file:File) {
  * @param {number} params.limit
  * @param {number=} params.offset
  */
-export function cloudDisk(params: Object = { limit: Number, offset: Number }) {
+export function cloudDisk(params:{ limit: number, offset: number }) {
     params.timestamp = new Date().getTime();
     return request({
         url: '/user/cloud',
@@ -42,7 +40,7 @@ export function cloudDisk(params: Object = { limit: Number, offset: Number }) {
 /**
  * 获取云盘歌曲详情（需要登录）
  */
-export function cloudDiskTrackDetail(id: Number) {
+export function cloudDiskTrackDetail(id: number) {
     return request({
         url: '/user/cloud/detail',
         method: 'get',
@@ -57,7 +55,7 @@ export function cloudDiskTrackDetail(id: Number) {
  * 删除云盘歌曲（需要登录）
  * @param {Array} id
  */
-export function cloudDiskTrackDelete(id: Number) {
+export function cloudDiskTrackDelete(id: number) {
     return request({
         url: '/user/cloud/del',
         method: 'get',
