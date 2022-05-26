@@ -7,12 +7,12 @@ import { useRouter } from "vue-router";
 // const { isLoggedIn } = require('./utils/auth.js')
 import { isLoggedIn } from "./utils/auth"
 import { useMessageStore } from "./stores/message";
-import { ElMessage } from 'element-plus'
+// import { ElMessage } from 'element-plus'
 const router = useRouter();
 console.log('script of App.vue', isLoggedIn())
 if (isLoggedIn()) {
   router.push({
-    name: 'main'
+    name: 'MyCloud'
   });
 }
 else {
@@ -20,6 +20,7 @@ else {
     name: 'login'
   });
 }
+
 const messageStore = useMessageStore()
 // https://pinia.vuejs.org/core-concepts/actions.html#subscribing-to-actions
 const unsubscribe = messageStore.$onAction(
@@ -31,9 +32,9 @@ const unsubscribe = messageStore.$onAction(
     onError, // hook if the action throws or rejects
   }) => {
     if (name === 'send') {
+      console.log('messageStore.action.send',args)
       ElMessage({
         message: args[0],
-        grouping: true,
         type: args[1],
       })
     }

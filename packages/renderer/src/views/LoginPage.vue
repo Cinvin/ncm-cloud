@@ -3,14 +3,11 @@ import QRCode from 'qrcode';
 import { ref, reactive, onDeactivated } from 'vue'
 import { setCookies } from '../utils/auth';
 import { useMessageStore } from "../stores/message";
-import { useProfileStore } from '../stores/profile';
 import { useRouter } from "vue-router";
 import { loginWithPhone, loginWithEmail, loginQrCodeKey, loginQrCodeCheck } from "../api/auth";
-// const { loginWithPhone, loginWithEmail, loginQrCodeKey, loginQrCodeCheck } = require('../api/auth')
 
 const router = useRouter();
 
-let profile = useProfileStore()
 const messageStore = useMessageStore()
 let activeName = ref('qr')
 
@@ -26,7 +23,7 @@ let formEmail = reactive({
 let qrCode = reactive({
   key: '',
   svg: '',
-  infor:''
+  infor: ''
 })
 let processing = ref(false)
 
@@ -100,14 +97,14 @@ function checkQrCodeLogin() {
     loginQrCodeCheck(qrCode.key).then((result: any) => {
       if (result.code === 800) {
         getQrCodeKey(); // 重新生成QrCode
-        qrCode.infor='二维码已失效，请重新扫码'
+        qrCode.infor = '二维码已失效，请重新扫码'
       } else if (result.code === 802) {
-        qrCode.infor='扫描成功，请在手机上确认登录'
+        qrCode.infor = '扫描成功，请在手机上确认登录'
       } else if (result.code === 801) {
-        qrCode.infor='打开网易云音乐APP扫码登录'
+        qrCode.infor = '打开网易云音乐APP扫码登录'
       } else if (result.code === 803) {
         clearInterval(qrCodeCheckInterval);
-        qrCode.infor='登录成功，请稍等...'
+        qrCode.infor = '登录成功，请稍等...'
         result.code = 200;
         result.cookie = result.cookie.replace('HTTPOnly', '');
         handleLoginResponse(result);
@@ -119,6 +116,7 @@ onDeactivated(() => {
   clearInterval(qrCodeCheckInterval);
 })
 function modeChange(tabname: string) {
+  console.log(tabname)
   if (tabname === 'qrCode') {
     checkQrCodeLogin();
   } else {
@@ -134,7 +132,7 @@ function handleLoginResponse(this: any, data: any) {
   }
   if (data.code === 200) {
     setCookies(data.cookie);
-    profile.$state=data.body.profile
+    clearInterval(qrCodeCheckInterval);
     router.push({ name: 'main' });
   } else {
     processing.value = false;
@@ -146,17 +144,16 @@ getQrCodeKey()
 </script>
 
 <template>
-  <h1>LoginPage</h1>
   <div>
     <el-card class="login-box">
       <el-tabs v-model="activeName" @tab-change="modeChange" stretch>
         <el-tab-pane label="二维码" name="qr">
-          <div v-show="qrCode.svg" class="qr-code-container">
-            <img :src="qrCode.svg" />
-          </div>
-          <div class="qr-code-info">
+          <el-row v-show="qrCode.svg" justify="center">
+            <img :src="qrCode.svg" class="qrCode" />
+          </el-row>
+          <el-row v-show="qrCode.infor" justify="center">
             {{ qrCode.infor }}
-          </div>
+          </el-row>
         </el-tab-pane>
         <el-tab-pane label="手机" name="phone">
           <el-form label-width="100px" :model="formPhone" style="max-width: 460px">
@@ -166,7 +163,10 @@ getQrCodeKey()
             <el-form-item label="密码">
               <el-input v-model="formPhone.password" type="password" />
             </el-form-item>
-            <el-button type="primary" @click="onPhoneSubmit">登录</el-button>
+            <el-form-item>
+              <el-button type="primary" @click="onPhoneSubmit">登录</el-button>
+            </el-form-item>
+
           </el-form>
         </el-tab-pane>
         <el-tab-pane label="邮箱" name="email">
@@ -177,7 +177,9 @@ getQrCodeKey()
             <el-form-item label="密码">
               <el-input v-model="formEmail.password" type="password" />
             </el-form-item>
-            <el-button type="primary" @click="onEmailSubmit">登录</el-button>
+            <el-form-item>
+              <el-button type="primary" @click="onEmailSubmit">登录</el-button>
+            </el-form-item>
           </el-form>
         </el-tab-pane>
       </el-tabs>
@@ -195,5 +197,9 @@ getQrCodeKey()
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
+}
+
+.qrCode {
+  margin: auto
 }
 </style>

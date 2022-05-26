@@ -1,13 +1,14 @@
 <script setup lang="ts">
 import { ref, reactive, computed } from 'vue'
 import { getSearch } from '../api/search'
-import { searchSinger, searchAlbum, searchSong } from '../api/migu'
+import { searchSinger, searchAlbum, searchSong, songItemformat } from '../api/migu'
 import { generateSingerTasks, generateAlbumTasks } from '../utils/migu2ncm'
 import { uploadSong, cloudDiskTrackMatch } from '../api/cloud'
 import { useMessageStore } from '../stores/message'
 import { useTaskStatusStore } from '../stores/taskStatus'
 import { storeToRefs } from 'pinia'
 import axios from 'axios';
+import { shell } from 'electron'
 
 let MessageStore = useMessageStore()
 let TaskStatusStore = useTaskStatusStore()
@@ -23,17 +24,60 @@ let dialogSelector = reactive({
   platform: '',
   keyword: '',
   resourceType: '',
+  miguSongItem: {},
 })
 
-let miguTaget = reactive({
+let miguSingerTaget = reactive({
   id: '',
   name: '',
-  resourceType: ''
+  link(){
+    return `https://music.migu.cn/v3/music/artist/${this.id}`
+  }
+})
+let ncmSingerTaget = reactive({
+  id: 0,
+  name: '',
+  link(){
+    return `https://music.163.com/artist?id=${this.id}`
+  }
 })
 
-let ncmTaget = reactive({
+let miguAlbumTaget = reactive({
+  id: '',
+  name: '',
+  resourceType: '',
+  link(){
+    if (this.resourceType=='2003'){
+      return `https://music.migu.cn/v3/music/album/${this.id}`
+    }
+    else if (this.resourceType=='5'){
+      return `https://music.migu.cn/v3/music/digital_album/${this.id}`
+    }
+    return ''
+  }
+})
+let ncmAlbumTaget = reactive({
   id: 0,
-  name: ''
+  name: '',
+  link(){
+    return `https://music.163.com/album?id=${this.id}`
+  }
+})
+
+let miguSongTaget = reactive({
+  id: '',
+  name: '',
+  songItem: {},
+  link(){
+    return `https://music.migu.cn/v3/music/song/${this.id}`
+  }
+})
+let ncmSongTaget = reactive({
+  id: 0,
+  name: '',
+  link(){
+    return `https://music.163.com/song?id=${this.id}`
+  }
 })
 
 let limitOption = reactive({
@@ -42,7 +86,7 @@ let limitOption = reactive({
   FLAC: false,
 })
 
-let taskListData: { ncmSongId: any; migucontentId: any; miguURL: string; miguformatType: string; songName: any; albumName: any; artists: any; isInCloud: any; isNoCopyRight: boolean; isVIP: boolean; status: string }[]
+let taskListData: { ncmSongId: any; migucontentId: any; miguURL: string; miguformatType: string; songName: any; albumName: any; artists: any; isInCloud: boolean; isNoCopyRight: boolean; isVIP: boolean; status: string; sort: number; progress: number; }[]
 taskListData = []
 let taskList = reactive({
   data: taskListData,
@@ -50,13 +94,10 @@ let taskList = reactive({
 
 let statusDesc = ref('')
 
-function itemTypeChange() {
-  miguTaget.id = ''
-  miguTaget.name = ''
-  miguTaget.resourceType = ''
-  ncmTaget.id = 0
-  ncmTaget.name = ''
+function openExternal(url:string){
+  shell.openExternal(url)
 }
+
 function OpenDialogSelector(platform: string) {
   dialogSelector.platform = platform
   dialogSelector.visiable = true
@@ -117,28 +158,52 @@ const handleSelectTableCurrentChange = (val: any | undefined) => {
   if (val) {
     dialogSelector.selectedId = val.id
     dialogSelector.selectedName = val.name
-    if (val.resourceType) {
+    if (dialogSelector.platform == 'migu' && val.resourceType) {
       dialogSelector.resourceType = val.resourceType
+    }
+    if (itemType.value == 3 && dialogSelector.platform == 'migu') {
+      dialogSelector.miguSongItem = songItemformat(val)
     }
   }
 }
 function handleSelected() {
   if (dialogSelector.platform == 'migu') {
-    miguTaget.id = dialogSelector.selectedId.toString()
-    miguTaget.name = dialogSelector.selectedName
-    if (dialogSelector.resourceType.length > 0) {
-      miguTaget.resourceType = dialogSelector.resourceType
+    if (itemType.value == 1) {
+      miguSingerTaget.id = dialogSelector.selectedId.toString()
+      miguSingerTaget.name = dialogSelector.selectedName
+    }
+    else if (itemType.value == 2) {
+      miguAlbumTaget.id = dialogSelector.selectedId.toString()
+      miguAlbumTaget.name = dialogSelector.selectedName
+      miguAlbumTaget.resourceType = dialogSelector.resourceType
+    }
+    else if (itemType.value == 3) {
+      miguSongTaget.id = dialogSelector.selectedId.toString()
+      miguSongTaget.name = dialogSelector.selectedName
+      miguSongTaget.songItem = dialogSelector.miguSongItem
     }
   }
   else if (dialogSelector.platform == 'ncm') {
-    ncmTaget.id = Number(dialogSelector.selectedId)
-    ncmTaget.name = dialogSelector.selectedName
+    if (itemType.value == 1) {
+      ncmSingerTaget.id = Number(dialogSelector.selectedId)
+      ncmSingerTaget.name = dialogSelector.selectedName
+    }
+    else if (itemType.value == 2) {
+      ncmAlbumTaget.id = Number(dialogSelector.selectedId)
+      ncmAlbumTaget.name = dialogSelector.selectedName
+    }
+    else if (itemType.value == 3) {
+      ncmSongTaget.id = Number(dialogSelector.selectedId)
+      ncmSongTaget.name = dialogSelector.selectedName
+    }
   }
+  autoFillAnother()
   dialogSelector.selectedId = ''
   dialogSelector.selectedName = ''
   dialogSelector.platform = ''
   dialogSelector.keyword = ''
   dialogSelector.resourceType = ''
+  dialogSelector.miguSongItem = {}
   dialogSelector.data.splice(0, dialogSelector.data.length);
   dialogSelector.visiable = false
 }
@@ -148,22 +213,54 @@ const dialogBeforeClose = (done: () => void) => {
   dialogSelector.platform = ''
   dialogSelector.keyword = ''
   dialogSelector.resourceType = ''
+  dialogSelector.miguSongItem = {}
   dialogSelector.data.splice(0, dialogSelector.data.length);
   done()
 }
 
 let startButtonDisabled = computed(() => {
-  return miguTaget.id == '' || ncmTaget.id == 0
+    return working.value
+    || (itemType.value==1 && miguSingerTaget.id == '' || ncmSingerTaget.id == 0)
+    || (itemType.value==2 && miguAlbumTaget.id == '' || ncmAlbumTaget.id == 0)
+    || (itemType.value==3 && miguSongTaget.id == '' || ncmSongTaget.id == 0)
     || (itemType.value != 3 && (!limitOption.CopyRight && !limitOption.FLAC && !limitOption.VIP))
-    || working.value
 })
+
+function autoFillAnother() {
+  if (itemType.value === 1) {
+    if (miguSingerTaget.id !== '' && ncmSingerTaget.id == 0) {
+      getSearch({ keywords: dialogSelector.keyword, type: 100, limit: 10 })
+        .then((res: any) => {
+          let artists = res.result.artists
+          for (let artist of artists) {
+            if (artist.name == miguSingerTaget.name) {
+              ncmSingerTaget.id = artist.id
+              ncmSingerTaget.name = artist.name
+            }
+          }
+        })
+    }
+    else if (miguSingerTaget.name.length == 0 && ncmSingerTaget.id > 0) {
+      searchSinger(dialogSelector.keyword)
+        .then((res: any) => {
+          let artists = res
+          for (let artist of artists) {
+            if (artist.name == miguSingerTaget.name) {
+              ncmSingerTaget.id = artist.id
+              ncmSingerTaget.name = artist.name
+            }
+          }
+        })
+    }
+  }
+}
 
 function handleStart() {
   working.value = true
   taskList.data.splice(0)
   if (itemType.value == 1) {
     statusDesc.value = '获取歌曲信息ing'
-    generateSingerTasks(ncmTaget.id, miguTaget.id, limitOption).then(async (res) => {
+    generateSingerTasks(ncmSingerTaget.id, miguSingerTaget.id, limitOption).then(async (res) => {
       taskList.data = res
       statusDesc.value = ''
       handleTasks()
@@ -171,72 +268,133 @@ function handleStart() {
   }
   else if (itemType.value == 2) {
     statusDesc.value = '获取歌曲信息ing'
-    generateAlbumTasks(ncmTaget.id, miguTaget.id, miguTaget.resourceType, limitOption).then(async (res) => {
+    generateAlbumTasks(ncmAlbumTaget.id, miguAlbumTaget.id, miguAlbumTaget.resourceType, limitOption).then(async (res) => {
       taskList.data = res
       statusDesc.value = ''
       handleTasks()
     })
   }
+  else if (itemType.value == 3) {
+    let matchItem = {
+      ncmSongId: ncmSongTaget.id,
+      migucontentId: miguSongTaget.songItem.contentId,
+      miguURL: miguSongTaget.songItem.bestQualityUrl,
+      miguformatType: miguSongTaget.songItem.bestQualityformatType,
+      songName: miguSongTaget.name,
+      albumName: miguSongTaget.songItem.album.name,
+      artists: miguSongTaget.songItem.artists.map((a: { name: any }) => { return a.name }).toString(),
+      isInCloud: false,
+      isNoCopyRight: false,
+      isVIP: false,
+      status: '未开始',
+      sort: 3,
+      progress: 0,
+    }
+    taskList.data = [matchItem]
+    handleTask(0)
+  }
   console.log('working.value=false')
   working.value = false
 }
 async function handleTasks() {
+  if (taskList.data.length == 0) return
   statusDesc.value = '下载上传ing'
-  for (var i = 0; i < taskList.data.length; ++i) {
-    handleTask(i)
-  }
-  statusDesc.value = ''
-}
-async function handleTask(index: number) {
   working.value = true
-  let task = taskList.data[index]
+  let limit = Math.min(4, taskList.data.length)
+  let Pool: Promise<number>[] = []
+  let currentTaskIndex = 0
+  while (currentTaskIndex < limit) {
+    Pool.push(handleTask(currentTaskIndex, Pool.length))
+    currentTaskIndex++;
+  }
+  while (currentTaskIndex < taskList.data.length) {
+    await Promise.race(Pool).then((finishPoolIndex: number) => {
+      Pool[finishPoolIndex] = handleTask(currentTaskIndex, finishPoolIndex)
+      currentTaskIndex += 1
+    })
+  }
+  if (Pool.length > 0) {
+    Promise.all(Pool).then(() => {
+      statusDesc.value = ''
+      working.value = false
+    })
+  }
+  else {
+    statusDesc.value = ''
+    working.value = false
+  }
+}
+
+function handleReTryTask(taskIndex: number) {
+  statusDesc.value = '下载上传ing'
+  working.value = true
+  handleTask(taskIndex).finally(() => {
+    statusDesc.value = ''
+    working.value = false
+  })
+}
+
+function handleTask(taskIndex: number, poolIndex = 0) {
+  let task = taskList.data[taskIndex]
   task.status = '下载中'
-  await axios.get(task.miguURL, { responseType: "blob" })
-    .then((res) => {
+  task.sort = 2
+  return axios.get(task.miguURL,
+    {
+      responseType: "blob",
+      onDownloadProgress: (progressEvent) => {
+        if (progressEvent.lengthComputable) {
+          //属性lengthComputable主要表明总共需要完成的工作量和已经完成的工作是否可以被测量
+          //如果lengthComputable为false，就获取不到progressEvent.total和progressEvent.loaded
+          task.progress = progressEvent.loaded / progressEvent.total * 100 //实时获取最新下载进度
+        }
+      }
+    })
+    .then(async (res) => {
       console.log(res)
       if (res.status != 200) {
         task.status = '下载失败'
-        return
+        task.sort = 4
+        return poolIndex
       }
-      task.status = '下载完成'
       let content = res.data
       let fileName = task.miguformatType == 'SQ' ? `${task.songName}.flac` : `${task.songName}.mp3`
       console.log('before fileObj')
       let fileObj = new File([content], fileName)
       console.log(fileObj)
       task.status = '上传中'
-      uploadSong(fileObj).then((res: any) => {
+      task.sort = 1
+      await uploadSong(fileObj).then((res: any) => {
         console.log(res)
         if (res.code && res.code !== 200 && res.message) {
           MessageStore.send(res.message, 'warning')
           task.status = '上传失败 ' + res.message
+          task.sort = 4
         }
         else {
           task.status = '已上传'
           cloudDiskTrackMatch({ sid: res.privateCloud.songId, asid: task.ncmSongId }).then(() => {
             task.status = '已完成'
+            task.sort = 5
           })
         }
+        // return poolIndex
       })
         .catch((err) => {
           task.status = '上传失败 ' + err
+          task.sort = 4
         })
+      return poolIndex
     })
     .catch((err) => {
       task.status = '下载失败 ' + err
+      task.sort = 4
+      return poolIndex
     })
-    .finally(() => {
-      working.value = false
-    })
-  // .finally(() => {
-  //   doingCount -= 1
-  // })
-  statusDesc.value = ''
 }
 </script>
 
 <template>
-  <el-radio-group v-model="itemType" @change="itemTypeChange">
+  <el-radio-group v-model="itemType">
     <el-radio :label="1">歌手</el-radio>
     <el-radio :label="2">专辑</el-radio>
     <el-radio :label="3">歌曲</el-radio>
@@ -245,13 +403,17 @@ async function handleTask(index: number) {
     <el-col :span="12">
       <el-row align="middle">
         <el-button @click="OpenDialogSelector('migu')">选择咪咕目标</el-button>
-        <div v-if="miguTaget.id.length > 0">已选择{{ miguTaget.name }}</div>
+        <div v-if="itemType==1 && miguSingerTaget.id.length > 0"><el-link type="primary" @click="openExternal(miguSingerTaget.link())">已选择：{{ miguSingerTaget.name }}</el-link></div>
+        <div v-else-if="itemType==2 && miguAlbumTaget.id.length > 0"><el-link type="primary" @click="openExternal(miguAlbumTaget.link())">已选择：{{ miguAlbumTaget.name }}</el-link></div>
+        <div v-else-if="itemType==3 && miguSongTaget.id.length > 0"><el-link type="primary" @click="openExternal(miguSongTaget.link())">已选择：{{ miguSongTaget.name }}</el-link></div>
       </el-row>
     </el-col>
     <el-col :span="12">
       <el-row align="middle">
         <el-button @click="OpenDialogSelector('ncm')">选择网易云目标</el-button>
-        <div v-if="ncmTaget.id > 0">已选择{{ ncmTaget.name }}</div>
+        <div v-if="itemType==1 && ncmSingerTaget.id > 0"><el-link type="primary" @click="openExternal(ncmSingerTaget.link())">已选择：{{ ncmSingerTaget.name }}</el-link></div>
+        <div v-else-if="itemType==2 && ncmAlbumTaget.id > 0"><el-link type="primary" @click="openExternal(ncmAlbumTaget.link())">已选择：{{ ncmAlbumTaget.name }}</el-link></div>
+        <div v-else-if="itemType==3 && ncmSongTaget.id > 0"><el-link type="primary" @click="openExternal(ncmSongTaget.link())">已选择：{{ ncmSongTaget.name }}</el-link></div>
       </el-row>
     </el-col>
   </el-row>
@@ -259,9 +421,15 @@ async function handleTask(index: number) {
   <el-row justify="end" align="middle">
     <div v-if="statusDesc.length > 0">{{ statusDesc }}</div>
     <div v-if="itemType != 3">
-      <el-checkbox v-model="limitOption.CopyRight" label="无版权" />
-      <el-checkbox v-model="limitOption.VIP" label="VIP/付费" />
-      <el-checkbox v-model="limitOption.FLAC" label="咪咕无损" />
+      <el-tooltip effect="dark" content="网易云里无版权" placement="top">
+        <el-checkbox v-model="limitOption.CopyRight" label="无版权" />
+      </el-tooltip>
+      <el-tooltip effect="dark" content="网易云VIP单曲或付费专辑" placement="top">
+        <el-checkbox v-model="limitOption.VIP" label="VIP/付费" />
+      </el-tooltip>
+      <el-tooltip effect="dark" content="咪咕SQ品质" placement="top">
+        <el-checkbox v-model="limitOption.FLAC" label="咪咕无损" />
+      </el-tooltip>
     </div>
     <div>
       <el-button type="primary" @click="handleStart" :disabled="startButtonDisabled">开始</el-button>
@@ -269,12 +437,19 @@ async function handleTask(index: number) {
   </el-row>
 
   <el-row v-if="taskList.data.length > 0">
-    <el-table :data="taskList.data">
+    <el-table :data="taskList.data" :default-sort="{ prop: 'sort' }">
       <el-table-column property="songName" label="歌名" />
       <el-table-column property="artists" label="歌手" />
       <el-table-column property="albumName" label="专辑" />
       <el-table-column property="miguformatType" label="品质" />
-      <el-table-column property="status" label="状态" />
+      <el-table-column label="状态" sortable :sort-by="['sort']">
+        <template #default="scope">
+          <el-button v-if="scope.row.sort == 4" :disabled="working" @click="handleReTryTask(scope.$index)">重试
+          </el-button>
+          <el-progress v-if="scope.row.sort == 2" :percentage="scope.row.progress"></el-progress>
+          {{ scope.row.status }}
+        </template>
+      </el-table-column>
     </el-table>
   </el-row>
 

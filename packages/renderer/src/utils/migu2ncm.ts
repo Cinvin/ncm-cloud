@@ -45,6 +45,8 @@ export function generateSingerTasks(ncmId: number, miguId: string,
                     isNoCopyRight:ncmSong.privilege.st==-200,
                     isVIP:ncmSong.fee==1 || ncmSong.fee==4,
                     status:'未开始',
+                    sort:3,
+                    progress:0,
                 }
                 matchList.push(matchItem)
             }
@@ -104,6 +106,8 @@ export function generateAlbumTasks(ncmId: number, miguId: string,miguresourceTyp
                     isNoCopyRight:ncmSong.privilege.st==-200,
                     isVIP:ncmSong.fee==1 || ncmSong.fee==4,
                     status:'未开始',
+                    sort:3,
+                    progress:0,
                 }
                 matchList.push(matchItem)
             }

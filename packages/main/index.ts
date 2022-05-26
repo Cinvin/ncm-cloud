@@ -19,8 +19,8 @@ let win: BrowserWindow | null = null
 
 async function createWindow() {
   win = new BrowserWindow({
-    Width: 1080,
-    Height: 720,
+    width: 1080,
+    height: 720,
     minWidth: 1080,
     minHeight: 720,
     frame: !(process.platform === 'win32'),
@@ -40,6 +40,22 @@ async function createWindow() {
 
     win.loadURL(url)
     // win.webContents.openDevTools()
+
+    //cors https://zhuanlan.zhihu.com/p/443998585
+    win.webContents.session.webRequest.onBeforeSendHeaders(
+      (details, callback) => {
+        callback({ requestHeaders: { Origin: '*', ...details.requestHeaders } });
+      },
+    );
+  
+    win.webContents.session.webRequest.onHeadersReceived((details, callback) => {
+      callback({
+        responseHeaders: {
+          'Access-Control-Allow-Origin': ['*'],
+          ...details.responseHeaders,
+        },
+      });
+    });
   }
 
   // Test active push message to Renderer-process
