@@ -9,7 +9,6 @@ import { isLoggedIn } from "./utils/auth"
 import { useMessageStore } from "./stores/message";
 import { ElMessage } from 'element-plus'
 const router = useRouter();
-console.log('script of App.vue', isLoggedIn())
 if (isLoggedIn()) {
   router.push({
     name: 'MyCloud'
@@ -32,13 +31,11 @@ const unsubscribe = messageStore.$onAction(
     onError, // hook if the action throws or rejects
   }) => {
     if (name === 'send') {
-      console.log('messageStore.action.send',args)
       ElMessage({
         message: args[0],
-        type: args[1] ?? 'info',
+        type: args[1],
       })
     }
-
   }
 )
 

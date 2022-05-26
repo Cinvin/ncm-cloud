@@ -7,8 +7,8 @@
 
 [NeteaseCloudMusicApi](https://github.com/Binaryify/NeteaseCloudMusicApi)  
 
-[UnblockNeteaseMusic(咪咕部分)](https://github.com/Binaryify/NeteaseCloudMusicApi)  
+[UnblockNeteaseMusic(咪咕部分)](https://github.com/UnblockNeteaseMusic/server)  
 
 ## 框架
 
-[electron-vite-vue](https://github.com/UnblockNeteaseMusic/server)  
+[electron-vite-vue](https://github.com/electron-vite/electron-vite-vue)  

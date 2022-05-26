@@ -10,7 +10,7 @@ export async function getstrictSearch(artists: string[], album: string, songName
     let offset = 0
     let limit = 100
     while (hasMore) {
-        let res = await getSearch({ keywords: songName, type: 1, offset: offset, limit: limit })
+        let res:any = await getSearch({ keywords: songName, type: 1, offset: offset, limit: limit })
         hasMore = res.result.hasMore
         let find = res.result.songs.find((song: { name: string; album: { name: string; }; artists: any; }) => {
             if (song.name == songName && song.album.name == album) {

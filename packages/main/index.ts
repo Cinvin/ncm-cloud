@@ -24,7 +24,7 @@ async function createWindow() {
     minWidth: 1080,
     minHeight: 720,
     frame: !(process.platform === 'win32'),
-    title: 'zPlayer',
+    title: 'ncmCloud',
     webPreferences: {
       preload: join(__dirname, '../preload/index.cjs'),
       nodeIntegration: true,
@@ -98,7 +98,7 @@ app.on('activate', () => {
 app.on('ready',()=>{
   //ncmapi
   server.serveNcmApi({
-    port: 1115,
+    port: 21879,
   }).then((res:any)=>{
     const neteaseMusicAPI=res
   })

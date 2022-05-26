@@ -38,13 +38,10 @@ declare module '@vue/runtime-core' {
     HelloWorld: typeof import('./src/components/HelloWorld.vue')['default']
     Loading: typeof import('element-plus/es')['ElLoadingDirective']
     LocalUpload: typeof import('./src/components/LocalUpload.vue')['default']
-    'LocalUpload copy': typeof import('./src/components/LocalUpload copy.vue')['default']
     MiguUpload: typeof import('./src/components/MiguUpload.vue')['default']
     MyCloud: typeof import('./src/components/MyCloud.vue')['default']
-    'MyCloud copy': typeof import('./src/components/MyCloud copy.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
-    TemplatePage: typeof import('./src/components/TemplatePage.vue')['default']
   }
 }
 

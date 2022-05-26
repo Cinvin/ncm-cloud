@@ -1,10 +1,7 @@
 <script setup lang="ts">
-// import { ref } from 'vue'
-// defineProps<{ msg: string }>()
-// const count = ref(0)
+import { reactive } from 'vue'
 import { useRouter } from "vue-router";
 import { useRoute } from "vue-router";
-import { useProfileStore } from '../stores/profile';
 import { loginStatus } from '../api/auth';
 import { doLogout } from '../utils/auth'
 import { useTaskStatusStore } from "../stores/taskStatus";
@@ -14,10 +11,13 @@ let TaskStatusStore = useTaskStatusStore()
 let { working } = storeToRefs(TaskStatusStore)
 const router = useRouter();
 const route = useRoute();
-const profile = useProfileStore()
-
+let profile = reactive({
+  nickname:'',
+  avatarUrl:'',
+})
 loginStatus().then((res) => {
-  profile.$state = res.data.profile
+  profile.nickname = res.data.profile.nickname
+  profile.avatarUrl = res.data.profile.avatarUrl
 })
 
 function logout() {
@@ -34,8 +34,8 @@ function logout() {
         <!-- <el-row align="middle"> -->
         <el-dropdown @command="logout">
           <el-row align="middle">
-            <el-avatar :src="profile.avatarUrl" />
-            <span>{{ profile.nickname }}</span>
+            <el-avatar v-if="profile.avatarUrl" :src="profile.avatarUrl" />
+            <span v-if="profile.nickname">{{ profile.nickname }}</span>
           </el-row>
           <template #dropdown>
             <el-dropdown-menu>

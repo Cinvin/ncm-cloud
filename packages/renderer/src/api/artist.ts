@@ -15,7 +15,7 @@ export async function getArtistAllSongs (id:number){
     let limit = 100
     let offset = 0
     while (hasMore){
-        let response = await getArtistSongs(id,limit,offset)
+        let response:any = await getArtistSongs(id,limit,offset)
         // console.log(response)
         hasMore=response.more
         songList.push(...response.songs)

@@ -24,11 +24,11 @@ export function generateSingerTasks(ncmId: number, miguId: string,
                 // console.log(song.artists.split('|').sort().toString(),ncmSong.ar.map((artist)=>(artist.name)).sort().toString())
                 return song.name == ncmSong.name
                  && song.album == ncmSong.al.name
-                 && song.artists.split('|').sort().toString()==ncmSong.ar.map((artist)=>(artist.name)).sort().toString()
+                 && song.artists.split('|').sort().toString()==ncmSong.ar.map((artist: { name: any; })=>(artist.name)).sort().toString()
             })
             if (find){
                 let findmatch=matchList.find((match)=>{
-                    return match.migucontentId==find.contentId 
+                    return match.migucontentId==find?.contentId 
                 })
                 if (findmatch){
                     continue
@@ -64,7 +64,6 @@ export function generateSingerTasks(ncmId: number, miguId: string,
                 taskList.push(item)
             }
         }
-        console.log(taskList)
         return taskList
     })
 }
@@ -73,7 +72,7 @@ export function generateAlbumTasks(ncmId: number, miguId: string,miguresourceTyp
     limitOption:{CopyRight: boolean,VIP: boolean,FLAC: boolean}) {
     let promisencm = getAlbum(ncmId);
     let promisemigu = getAlbumSongs(miguId,miguresourceType)
-    return Promise.all([promisencm,promisemigu]).then((values)=>{
+    return Promise.all([promisencm,promisemigu]).then((values:any)=>{
         let ncmSongs=values[0].songs
         let miguSongs=values[1]
         
@@ -83,13 +82,13 @@ export function generateAlbumTasks(ncmId: number, miguId: string,miguresourceTyp
             // if(ncmSong.privilege.cs){
             //     continue
             // }
-            let find=miguSongs.find((song)=>{
+            let find=miguSongs.find((song: { name: any; artists: { split: (arg0: string) => { (): any; new(): any; sort: { (): { (): any; new(): any; toString: { (): any; new(): any; }; }; new(): any; }; }; }; })=>{
                 return song.name == ncmSong.name
-                 && song.artists.split('|').sort().toString()==ncmSong.ar.map((artist)=>(artist.name)).sort().toString()
+                 && song.artists.split('|').sort().toString()==ncmSong.ar.map((artist: { name: any; })=>(artist.name)).sort().toString()
             })
             if (find){
                 let findmatch=matchList.find((match)=>{
-                    return match.migucontentId==find.contentId 
+                    return match.migucontentId==find?.contentId 
                 })
                 if (findmatch){
                     continue
@@ -125,7 +124,6 @@ export function generateAlbumTasks(ncmId: number, miguId: string,miguresourceTyp
                 taskList.push(item)
             }
         }
-        console.log(taskList)
         return taskList
     })
 }

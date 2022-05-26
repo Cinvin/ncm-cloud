@@ -67,7 +67,7 @@ let ncmAlbumTaget = reactive({
 let miguSongTaget = reactive({
   id: '',
   name: '',
-  songItem: {},
+  songItem:<any>null,
   link(){
     return `https://music.migu.cn/v3/music/song/${this.id}`
   }
@@ -220,15 +220,15 @@ const dialogBeforeClose = (done: () => void) => {
 
 let startButtonDisabled = computed(() => {
     return working.value
-    || (itemType.value==1 && miguSingerTaget.id == '' || ncmSingerTaget.id == 0)
-    || (itemType.value==2 && miguAlbumTaget.id == '' || ncmAlbumTaget.id == 0)
-    || (itemType.value==3 && miguSongTaget.id == '' || ncmSongTaget.id == 0)
+    || (itemType.value==1 && (miguSingerTaget.id == '' || ncmSingerTaget.id == 0))
+    || (itemType.value==2 && (miguAlbumTaget.id == '' || ncmAlbumTaget.id == 0))
+    || (itemType.value==3 && (miguSongTaget.id == '' || ncmSongTaget.id == 0))
     || (itemType.value != 3 && (!limitOption.CopyRight && !limitOption.FLAC && !limitOption.VIP))
 })
 
 function autoFillAnother() {
   if (itemType.value === 1) {
-    if (miguSingerTaget.id !== '' && ncmSingerTaget.id == 0) {
+    if (miguSingerTaget.name.length >0 && ncmSingerTaget.name !== miguSingerTaget.name) {
       getSearch({ keywords: dialogSelector.keyword, type: 100, limit: 10 })
         .then((res: any) => {
           let artists = res.result.artists
@@ -240,14 +240,14 @@ function autoFillAnother() {
           }
         })
     }
-    else if (miguSingerTaget.name.length == 0 && ncmSingerTaget.id > 0) {
+    else if (ncmSingerTaget.name.length > 0 && miguSingerTaget.name !== ncmSingerTaget.name) {
       searchSinger(dialogSelector.keyword)
         .then((res: any) => {
           let artists = res
           for (let artist of artists) {
-            if (artist.name == miguSingerTaget.name) {
-              ncmSingerTaget.id = artist.id
-              ncmSingerTaget.name = artist.name
+            if (artist.name == ncmSingerTaget.name) {
+              miguSingerTaget.id = artist.id
+              miguSingerTaget.name = artist.name
             }
           }
         })
@@ -345,7 +345,7 @@ function handleTask(taskIndex: number, poolIndex = 0) {
         if (progressEvent.lengthComputable) {
           //属性lengthComputable主要表明总共需要完成的工作量和已经完成的工作是否可以被测量
           //如果lengthComputable为false，就获取不到progressEvent.total和progressEvent.loaded
-          task.progress = progressEvent.loaded / progressEvent.total * 100 //实时获取最新下载进度
+          task.progress = Math.round(progressEvent.loaded * 10000/ progressEvent.total) / 100 //实时获取最新下载进度
         }
       }
     })

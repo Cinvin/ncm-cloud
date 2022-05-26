@@ -10,7 +10,7 @@ export const useMessageStore = defineStore('message', {
   },
   actions:{
     
-    send(message:string,type:string) {
+    send(message:string,type:"success" | "info" | "warning" | "error") {
       this.message=message
       this.type=type
     },

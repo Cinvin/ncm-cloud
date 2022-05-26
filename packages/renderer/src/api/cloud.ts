@@ -28,7 +28,7 @@ export function uploadSong(file:File) {
  * @param {number} params.limit
  * @param {number=} params.offset
  */
-export function cloudDisk(params:{ limit: number, offset: number }) {
+export function cloudDisk(params:{ limit: number, offset: number, [timestamp: string]: any}) {
     params.timestamp = new Date().getTime();
     return request({
         url: '/user/cloud',

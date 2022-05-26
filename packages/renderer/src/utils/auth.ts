@@ -2,7 +2,8 @@ import Cookies from 'js-cookie';
 // const logout = require('../api/auth.js');
 import { logout } from '../api/auth';
 
-export function setCookies(str:string) {
+export function setCookies(strCookie:string) {
+  let str=strCookie.replace('; ;',';;').replace('; HTTPOnly;',';;')
   const cookies = str.split(';;');
   cookies.map(cookie => {
     document.cookie = cookie;
@@ -22,7 +23,6 @@ export function removeCookie(key:string) {
 
 // MUSIC_U 只有在账户登录的情况下才有
 export function isLoggedIn() {
-  console.log('MUSIC_U',getCookie('MUSIC_U'))
   return getCookie('MUSIC_U') !== null && getCookie('MUSIC_U') !== undefined;
 }
 

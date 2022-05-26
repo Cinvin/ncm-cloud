@@ -34,7 +34,7 @@ function beforeUpload(rawFile: UploadRawFile) {
 function UploadFloder(dir: string) {
   fs.readdir(dir, { withFileTypes: true }, function (err, files) {
     if (err) {
-      console.log('上传失败，读取文件夹失败：', dir, err);
+      console.log(dir, err);
     }
     for (let fileitem of files) {
       let fileName = path.join(dir, fileitem.name)
@@ -44,7 +44,6 @@ function UploadFloder(dir: string) {
       else if (isAudio(fileName)) {
         let fileBlob = fs.readFileSync(fileName)
         let FileObj = new File([fileBlob], fileName)
-        console.log(FileObj)
         startUploadSong(FileObj)
       }
     }
@@ -65,31 +64,24 @@ function startUploadSong(FileObj: File) {
     }
     else {
       updateFileList(path, '已上传')
-      console.log(res)
       let songid = res.privateCloud.songId
       let patharr = path.split('/')
-      console.log(patharr)
       let songName = patharr.pop()
       if (!songName) {
         return
       }
       else {
         songName = songName.split('.')[0]
-        console.log(songName)
       }
       let album = patharr.pop()
-      console.log(album)
       if (!album) {
         return
       }
       let artist = patharr.pop()
-      console.log(artist)
       if (!artist) {
         return
       }
-      console.log(songName,[artist],album)
       getstrictSearch([artist], album, songName).then((searchRes) => {
-        console.log(searchRes)
         if (searchRes) {
           cloudDiskTrackMatch({sid:songid,asid:searchRes.id}).then(()=>{
             updateFileList(path, '已匹配')
@@ -97,7 +89,6 @@ function startUploadSong(FileObj: File) {
         }
       })
     }
-    console.log(res)
   })
   .catch((err)=>{
     updateFileList(path, '上传失败：'+err)

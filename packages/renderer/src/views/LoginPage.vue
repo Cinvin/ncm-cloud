@@ -116,7 +116,6 @@ onDeactivated(() => {
   clearInterval(qrCodeCheckInterval);
 })
 function modeChange(tabname: string) {
-  console.log(tabname)
   if (tabname === 'qrCode') {
     checkQrCodeLogin();
   } else {

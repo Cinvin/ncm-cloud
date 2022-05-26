@@ -5,7 +5,7 @@ import {
   Search
   // Download,
 } from '@element-plus/icons-vue'
-// import { ElMessageBox } from 'element-plus'
+import { ElMessageBox } from 'element-plus'
 import { reactive, ref, watch, onBeforeMount } from 'vue'
 import { cloudDisk, cloudDiskTrackMatch, cloudDiskTrackDelete } from '../api/cloud'
 import { fileSizeDesc } from '../utils/file'
@@ -78,7 +78,6 @@ function onClickConnetion(songItem: any) {
   searchTable.keyword = songItem.songName + ' ' + songItem.album
   searchTable.fromId = songItem.songId
   searchTable.loading = true
-  // http://localhost:1115/search?keywords=%E6%B5%B7%E9%98%94%E5%A4%A9%E7%A9%BA
   getSearch({ keywords: searchTable.keyword, type: 1, limit: 10 })
     .then((res: any) => {
       searchTable.data = res.result.songs
@@ -90,7 +89,6 @@ function onClickConnetion(songItem: any) {
 }
 function handleMatchSearch() {
   searchTable.loading = true
-  // http://localhost:1115/search?keywords=%E6%B5%B7%E9%98%94%E5%A4%A9%E7%A9%BA
   getSearch({ keywords: searchTable.keyword, type: 1, limit: 10 })
     .then((res: any) => {
       searchTable.data = res.result.songs
