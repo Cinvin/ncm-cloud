@@ -50,7 +50,7 @@
     "@element-plus/icons-vue": "^1.1.4",
     "crypto-js": "^4.1.1",
     "dayjs": "^1.11.2",
-    "element-plus": "^2.2.0",
+    "element-plus": "^2.2.2",
     "js-cookie": "^3.0.1",
     "NeteaseCloudMusicApi": "^4.5.14",
     "pinia": "^2.0.14",
