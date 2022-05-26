@@ -7,7 +7,7 @@ import { useRouter } from "vue-router";
 // const { isLoggedIn } = require('./utils/auth.js')
 import { isLoggedIn } from "./utils/auth"
 import { useMessageStore } from "./stores/message";
-// import { ElMessage } from 'element-plus'
+import { ElMessage } from 'element-plus'
 const router = useRouter();
 console.log('script of App.vue', isLoggedIn())
 if (isLoggedIn()) {
@@ -35,7 +35,7 @@ const unsubscribe = messageStore.$onAction(
       console.log('messageStore.action.send',args)
       ElMessage({
         message: args[0],
-        type: args[1],
+        type: args[1] ?? 'info',
       })
     }
 
