@@ -4,7 +4,7 @@
 * 本地上传
 * 咪咕音源上传  
 
-本人前端小白,界面丑别喷
+本人前端小白,不保证没bug
 ## 部分截图
 ![我的云盘](https://raw.githubusercontent.com/Cinvin/ncm-cloud/master/screenshots/MyCloud.png)  
 ![本地上传](https://raw.githubusercontent.com/Cinvin/ncm-cloud/master/screenshots/LocalUpload.png)
