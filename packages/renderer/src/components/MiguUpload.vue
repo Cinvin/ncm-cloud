@@ -360,7 +360,7 @@ function handleTask(taskIndex: number, poolIndex = 0) {
       let content = res.data
       let fileName = task.miguformatType == 'SQ' ? `${task.songName}.flac` : `${task.songName}.mp3`
       console.log('before fileObj')
-      let fileObj = new File([content], fileName)
+      let fileObj = new File([content], fileName,{type:content.type})
       console.log(fileObj)
       task.status = '上传中'
       task.sort = 1

@@ -23,33 +23,33 @@ function beforeUpload(rawFile: UploadRawFile) {
   if (rawFile.type.match(/audio/)) {
     startUploadSong(rawFile)
   }
-  else if (rawFile.type === '') {
-    UploadFloder(rawFile.path)
-  }
+  // else if (rawFile.type === '') {
+  //   UploadFloder(rawFile.path)
+  // }
   else {
     MessageStore.send('请选择音频文件', 'error')
   }
   working.value=false
   return false
 }
-function UploadFloder(dir: string) {
-  fs.readdir(dir, { withFileTypes: true }, function (err, files) {
-    if (err) {
-      console.log(dir, err);
-    }
-    for (let fileitem of files) {
-      let fileName = path.join(dir, fileitem.name)
-      if (fileitem.isDirectory()) {
-        UploadFloder(fileName)
-      }
-      else if (isAudio(fileName)) {
-        let fileBlob = fs.readFileSync(fileName)
-        let FileObj = new File([fileBlob], fileName)
-        startUploadSong(FileObj)
-      }
-    }
-  });
-}
+// function UploadFloder(dir: string) {
+//   fs.readdir(dir, { withFileTypes: true }, function (err, files) {
+//     if (err) {
+//       console.log(dir, err);
+//     }
+//     for (let fileitem of files) {
+//       let fileName = path.join(dir, fileitem.name)
+//       if (fileitem.isDirectory()) {
+//         UploadFloder(fileName)
+//       }
+//       else if (isAudio(fileName)) {
+//         let fileBlob = fs.readFileSync(fileName)
+//         let FileObj = new File([fileBlob], fileName, {type:fileBlob.type})
+//         startUploadSong(FileObj)
+//       }
+//     }
+//   });
+// }
 
 function startUploadSong(FileObj: File) {
   let path = FileObj.path
@@ -115,7 +115,7 @@ function updateFileList(path: string, status: string) {
       <Upload />
     </el-icon>
     <div class="el-upload__text">
-      拖拽文件(夹) 或<em>点击上传</em>
+      拖拽文件 或<em>点击上传</em>
     </div>
     <template #tip>
       <div class="el-upload__tip">
