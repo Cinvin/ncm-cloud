@@ -35,7 +35,6 @@ declare module '@vue/runtime-core' {
     ElTabs: typeof import('element-plus/es')['ElTabs']
     ElTooltip: typeof import('element-plus/es')['ElTooltip']
     ElUpload: typeof import('element-plus/es')['ElUpload']
-    HelloWorld: typeof import('./src/components/HelloWorld.vue')['default']
     Loading: typeof import('element-plus/es')['ElLoadingDirective']
     LocalUpload: typeof import('./src/components/LocalUpload.vue')['default']
     MiguUpload: typeof import('./src/components/MiguUpload.vue')['default']
