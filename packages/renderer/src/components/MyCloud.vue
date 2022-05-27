@@ -2,8 +2,7 @@
 import {
   Connection,
   Delete,
-  Search
-  // Download,
+  Search,
 } from '@element-plus/icons-vue'
 import { ElMessageBox } from 'element-plus'
 import { reactive, ref, watch, onBeforeMount } from 'vue'

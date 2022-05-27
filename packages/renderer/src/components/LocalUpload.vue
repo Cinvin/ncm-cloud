@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Upload } from '@element-plus/icons-vue'
 import { reactive } from 'vue'
 import fs from 'fs'
 import path from 'path'
@@ -111,7 +112,7 @@ function updateFileList(path: string, status: string) {
 <template>
   <el-upload class="upload-demo" drag multiple access="audio/*" :before-upload="beforeUpload">
     <el-icon class="el-icon--upload">
-      <upload-filled />
+      <Upload />
     </el-icon>
     <div class="el-upload__text">
       拖拽文件(夹) 或<em>点击上传</em>
