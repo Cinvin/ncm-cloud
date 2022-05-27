@@ -32,6 +32,22 @@ async function createWindow() {
     },
   })
 
+  //cors https://zhuanlan.zhihu.com/p/443998585
+  win.webContents.session.webRequest.onBeforeSendHeaders(
+    (details, callback) => {
+      callback({ requestHeaders: { Origin: '*', ...details.requestHeaders } });
+    },
+  );
+
+  win.webContents.session.webRequest.onHeadersReceived((details, callback) => {
+    callback({
+      responseHeaders: {
+        'Access-Control-Allow-Origin': ['*'],
+        ...details.responseHeaders,
+      },
+    });
+  });
+
   if (app.isPackaged) {
     win.loadFile(join(__dirname, '../renderer/index.html'))
   } else {
@@ -40,22 +56,6 @@ async function createWindow() {
 
     win.loadURL(url)
     // win.webContents.openDevTools()
-
-    //cors https://zhuanlan.zhihu.com/p/443998585
-    win.webContents.session.webRequest.onBeforeSendHeaders(
-      (details, callback) => {
-        callback({ requestHeaders: { Origin: '*', ...details.requestHeaders } });
-      },
-    );
-  
-    win.webContents.session.webRequest.onHeadersReceived((details, callback) => {
-      callback({
-        responseHeaders: {
-          'Access-Control-Allow-Origin': ['*'],
-          ...details.responseHeaders,
-        },
-      });
-    });
   }
 
   // Test active push message to Renderer-process
@@ -95,11 +95,11 @@ app.on('activate', () => {
   }
 })
 
-app.on('ready',()=>{
+app.on('ready', () => {
   //ncmapi
   server.serveNcmApi({
     port: 21879,
-  }).then((res:any)=>{
-    const neteaseMusicAPI=res
+  }).then((res: any) => {
+    const neteaseMusicAPI = res
   })
 })

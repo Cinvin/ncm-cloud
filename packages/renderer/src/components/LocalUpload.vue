@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, reactive } from 'vue'
+import { reactive } from 'vue'
 import fs from 'fs'
 import path from 'path'
 import { isAudio } from '../utils/file'

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { reactive } from 'vue'
+import { onMounted, reactive } from 'vue'
 import { useRouter } from "vue-router";
 import { useRoute } from "vue-router";
 import { loginStatus } from '../api/auth';
@@ -12,12 +12,16 @@ let { working } = storeToRefs(TaskStatusStore)
 const router = useRouter();
 const route = useRoute();
 let profile = reactive({
-  nickname:'',
-  avatarUrl:'',
+  nickname: '',
+  avatarUrl: '',
 })
-loginStatus().then((res) => {
-  profile.nickname = res.data.profile.nickname
-  profile.avatarUrl = res.data.profile.avatarUrl
+
+
+onMounted(() => {
+  loginStatus().then((res) => {
+    profile.nickname = res.data.profile.nickname
+    profile.avatarUrl = res.data.profile.avatarUrl
+  })
 })
 
 function logout() {

@@ -1,7 +1,4 @@
 
-import { or } from '@vueuse/core';
-import { ALL } from 'dns'
-import { values } from 'lodash';
 import { getAlbum } from '../api/album';
 import { getArtistAllSongs } from '../api/artist'
 import { getSingerAlbumsSongs,getAlbumSongs } from '../api/migu'
@@ -16,10 +13,6 @@ export function generateSingerTasks(ncmId: number, miguId: string,
         //step.1 匹配 去重(如 英雄:英雄和周杰伦的床边故事:英雄 是同一文件(同一contentId))
         let matchList=[]
         for (let ncmSong of ncmSongs){
-            //已在云盘 跳过
-            // if(ncmSong.privilege.cs){
-            //     continue
-            // }
             let find=miguSongs.find((song)=>{
                 // console.log(song.artists.split('|').sort().toString(),ncmSong.ar.map((artist)=>(artist.name)).sort().toString())
                 return song.name == ncmSong.name

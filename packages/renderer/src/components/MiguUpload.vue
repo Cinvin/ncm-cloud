@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, reactive, computed } from 'vue'
+import { Search } from '@element-plus/icons-vue'
 import { getSearch } from '../api/search'
 import { searchSinger, searchAlbum, searchSong, songItemformat } from '../api/migu'
 import { generateSingerTasks, generateAlbumTasks } from '../utils/migu2ncm'
@@ -30,14 +31,14 @@ let dialogSelector = reactive({
 let miguSingerTaget = reactive({
   id: '',
   name: '',
-  link(){
+  link() {
     return `https://music.migu.cn/v3/music/artist/${this.id}`
   }
 })
 let ncmSingerTaget = reactive({
   id: 0,
   name: '',
-  link(){
+  link() {
     return `https://music.163.com/artist?id=${this.id}`
   }
 })
@@ -46,11 +47,11 @@ let miguAlbumTaget = reactive({
   id: '',
   name: '',
   resourceType: '',
-  link(){
-    if (this.resourceType=='2003'){
+  link() {
+    if (this.resourceType == '2003') {
       return `https://music.migu.cn/v3/music/album/${this.id}`
     }
-    else if (this.resourceType=='5'){
+    else if (this.resourceType == '5') {
       return `https://music.migu.cn/v3/music/digital_album/${this.id}`
     }
     return ''
@@ -59,7 +60,7 @@ let miguAlbumTaget = reactive({
 let ncmAlbumTaget = reactive({
   id: 0,
   name: '',
-  link(){
+  link() {
     return `https://music.163.com/album?id=${this.id}`
   }
 })
@@ -67,15 +68,15 @@ let ncmAlbumTaget = reactive({
 let miguSongTaget = reactive({
   id: '',
   name: '',
-  songItem:<any>null,
-  link(){
+  songItem: <any>null,
+  link() {
     return `https://music.migu.cn/v3/music/song/${this.id}`
   }
 })
 let ncmSongTaget = reactive({
   id: 0,
   name: '',
-  link(){
+  link() {
     return `https://music.163.com/song?id=${this.id}`
   }
 })
@@ -94,7 +95,7 @@ let taskList = reactive({
 
 let statusDesc = ref('')
 
-function openExternal(url:string){
+function openExternal(url: string) {
   shell.openExternal(url)
 }
 
@@ -219,16 +220,16 @@ const dialogBeforeClose = (done: () => void) => {
 }
 
 let startButtonDisabled = computed(() => {
-    return working.value
-    || (itemType.value==1 && (miguSingerTaget.id == '' || ncmSingerTaget.id == 0))
-    || (itemType.value==2 && (miguAlbumTaget.id == '' || ncmAlbumTaget.id == 0))
-    || (itemType.value==3 && (miguSongTaget.id == '' || ncmSongTaget.id == 0))
+  return working.value
+    || (itemType.value == 1 && (miguSingerTaget.id == '' || ncmSingerTaget.id == 0))
+    || (itemType.value == 2 && (miguAlbumTaget.id == '' || ncmAlbumTaget.id == 0))
+    || (itemType.value == 3 && (miguSongTaget.id == '' || ncmSongTaget.id == 0))
     || (itemType.value != 3 && (!limitOption.CopyRight && !limitOption.FLAC && !limitOption.VIP))
 })
 
 function autoFillAnother() {
   if (itemType.value === 1) {
-    if (miguSingerTaget.name.length >0 && ncmSingerTaget.name !== miguSingerTaget.name) {
+    if (miguSingerTaget.name.length > 0 && ncmSingerTaget.name !== miguSingerTaget.name) {
       getSearch({ keywords: dialogSelector.keyword, type: 100, limit: 10 })
         .then((res: any) => {
           let artists = res.result.artists
@@ -300,7 +301,7 @@ async function handleTasks() {
   if (taskList.data.length == 0) return
   statusDesc.value = '下载上传ing'
   working.value = true
-  let limit = Math.min(4, taskList.data.length)
+  let limit = Math.min(3, taskList.data.length)
   let Pool: Promise<number>[] = []
   let currentTaskIndex = 0
   while (currentTaskIndex < limit) {
@@ -345,7 +346,7 @@ function handleTask(taskIndex: number, poolIndex = 0) {
         if (progressEvent.lengthComputable) {
           //属性lengthComputable主要表明总共需要完成的工作量和已经完成的工作是否可以被测量
           //如果lengthComputable为false，就获取不到progressEvent.total和progressEvent.loaded
-          task.progress = Math.round(progressEvent.loaded * 10000/ progressEvent.total) / 100 //实时获取最新下载进度
+          task.progress = Math.round(progressEvent.loaded * 10000 / progressEvent.total) / 100 //实时获取最新下载进度
         }
       }
     })
@@ -403,17 +404,29 @@ function handleTask(taskIndex: number, poolIndex = 0) {
     <el-col :span="12">
       <el-row align="middle">
         <el-button @click="OpenDialogSelector('migu')">选择咪咕目标</el-button>
-        <div v-if="itemType==1 && miguSingerTaget.id.length > 0"><el-link type="primary" @click="openExternal(miguSingerTaget.link())">已选择：{{ miguSingerTaget.name }}</el-link></div>
-        <div v-else-if="itemType==2 && miguAlbumTaget.id.length > 0"><el-link type="primary" @click="openExternal(miguAlbumTaget.link())">已选择：{{ miguAlbumTaget.name }}</el-link></div>
-        <div v-else-if="itemType==3 && miguSongTaget.id.length > 0"><el-link type="primary" @click="openExternal(miguSongTaget.link())">已选择：{{ miguSongTaget.name }}</el-link></div>
+        <div v-if="itemType == 1 && miguSingerTaget.id.length > 0">
+          <el-link type="primary" @click="openExternal(miguSingerTaget.link())">已选择：{{ miguSingerTaget.name }}</el-link>
+        </div>
+        <div v-else-if="itemType == 2 && miguAlbumTaget.id.length > 0">
+          <el-link type="primary" @click="openExternal(miguAlbumTaget.link())">已选择：{{ miguAlbumTaget.name }}</el-link>
+        </div>
+        <div v-else-if="itemType == 3 && miguSongTaget.id.length > 0">
+          <el-link type="primary" @click="openExternal(miguSongTaget.link())">已选择：{{ miguSongTaget.name }}</el-link>
+        </div>
       </el-row>
     </el-col>
     <el-col :span="12">
       <el-row align="middle">
         <el-button @click="OpenDialogSelector('ncm')">选择网易云目标</el-button>
-        <div v-if="itemType==1 && ncmSingerTaget.id > 0"><el-link type="primary" @click="openExternal(ncmSingerTaget.link())">已选择：{{ ncmSingerTaget.name }}</el-link></div>
-        <div v-else-if="itemType==2 && ncmAlbumTaget.id > 0"><el-link type="primary" @click="openExternal(ncmAlbumTaget.link())">已选择：{{ ncmAlbumTaget.name }}</el-link></div>
-        <div v-else-if="itemType==3 && ncmSongTaget.id > 0"><el-link type="primary" @click="openExternal(ncmSongTaget.link())">已选择：{{ ncmSongTaget.name }}</el-link></div>
+        <div v-if="itemType == 1 && ncmSingerTaget.id > 0">
+          <el-link type="primary" @click="openExternal(ncmSingerTaget.link())">已选择：{{ ncmSingerTaget.name }}</el-link>
+        </div>
+        <div v-else-if="itemType == 2 && ncmAlbumTaget.id > 0">
+          <el-link type="primary" @click="openExternal(ncmAlbumTaget.link())">已选择：{{ ncmAlbumTaget.name }}</el-link>
+        </div>
+        <div v-else-if="itemType == 3 && ncmSongTaget.id > 0">
+          <el-link type="primary" @click="openExternal(ncmSongTaget.link())">已选择：{{ ncmSongTaget.name }}</el-link>
+        </div>
       </el-row>
     </el-col>
   </el-row>

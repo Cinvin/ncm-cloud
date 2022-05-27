@@ -2,9 +2,6 @@
 // This starter template is using Vue 3 <script setup> SFCs
 // Check out https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup
 import { useRouter } from "vue-router";
-
-// import { isLoggedIn } from "./utils/auth.js"
-// const { isLoggedIn } = require('./utils/auth.js')
 import { isLoggedIn } from "./utils/auth"
 import { useMessageStore } from "./stores/message";
 import { ElMessage } from 'element-plus'
