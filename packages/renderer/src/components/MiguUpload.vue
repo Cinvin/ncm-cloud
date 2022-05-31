@@ -237,6 +237,7 @@ function autoFillAnother() {
             if (artist.name == miguSingerTaget.name) {
               ncmSingerTaget.id = artist.id
               ncmSingerTaget.name = artist.name
+              break;
             }
           }
         })
@@ -249,6 +250,7 @@ function autoFillAnother() {
             if (artist.name == ncmSingerTaget.name) {
               miguSingerTaget.id = artist.id
               miguSingerTaget.name = artist.name
+              break;
             }
           }
         })
