@@ -20,27 +20,27 @@ function search(keyword: string, searchType: number) {
 			// console.log(response.data.singerResultData.result)
 			return response
 		})
-		.catch((e:any) => {
+		.catch((e: any) => {
 			console.log(e)
 		})
 };
-export function searchSinger(keyword: string){
-	return search(keyword,1).then((res:any)=>{
+export function searchSinger(keyword: string) {
+	return search(keyword, 1).then((res: any) => {
 		// console.log(res)
 		// [
 		// 	{ id: '112', name: '周杰伦', highlightStr: [ '周杰伦' ] },
 		// 	{ id: '1002359216', name: '周杰伦战队', highlightStr: [ '周杰伦' ] }
 		// ]
-		if (res && res.data.singerResultData.result){
+		if (res && res.data.singerResultData.result) {
 			return res.data.singerResultData.result
 		}
 		return []
 	})
-	.catch(()=>{return []})
+		.catch(() => { return [] })
 }
 
-export function searchAlbum(keyword: string){
-	return search(keyword,2).then((res:any)=>{
+export function searchAlbum(keyword: string) {
+	return search(keyword, 2).then((res: any) => {
 		// console.log(res)
 		// [
 		// 	{
@@ -56,16 +56,16 @@ export function searchAlbum(keyword: string){
 		// 	  albumAliasName: '周杰伦 2004 无与伦比 演唱会 Live CD、Jay Chou 2004 Incomparable Concert Live'
 		// 	},
 		// ]
-		if (res && res.data.albumResultData.result){
+		if (res && res.data.albumResultData.result) {
 			return res.data.albumResultData.result
 		}
 		return []
 	})
-	.catch(()=>{return []})
+		.catch(() => { return [] })
 }
 
-export function searchSong(keyword: string){
-	return search(keyword,3).then((res:any)=>{
+export function searchSong(keyword: string) {
+	return search(keyword, 3).then((res: any) => {
 		// console.log(res)
 		// [
 		// 	{
@@ -112,142 +112,144 @@ export function searchSong(keyword: string){
 		// 	  mvCopyright: '01'
 		// 	},
 		// ]
-		if (res && res.data.songResultData.result){
+		if (res && res.data.songResultData.result) {
 			return res.data.songResultData.result
 		}
 		return []
 	})
-	.catch(()=>{return []})
+		.catch(() => { return [] })
 }
 
-export function songItemformat(song:any) {
-    let item = {
-        id: song.songId,
-        name: dealSongName(song.songName || song.name),
-        album: song.album || song.albums && song.albums[0],
-        artists: song.singer || song.singers,
-        contentId: song.contentId,
-		bestQualityformatType:'',
-		bestQualityUrl:''
-    };
-    let resources = song.newRateFormats.map((detail:any) => ({
-        formatType: detail.formatType,
-        url: encodeURI(detail.url || detail.androidUrl),
-    }))
-    if (resources.length > 0) {
-        resources.sort((a:{formatType:string}, b:{formatType:string}) => {
-            return formatTypePriority(a.formatType) - formatTypePriority(b.formatType)
-        })
-        let tageturl = resources[0].url
-        if (tageturl.startsWith('$')) {
-            item.bestQualityformatType = resources[0].formatType;
-            let toneFlag = item.bestQualityformatType
-            item.bestQualityUrl = `https://app.pd.nf.migu.cn/MIGUM3.0/v1.0/content/sub/listenSong.do?channel=mx&copyrightId=${song.copyrightId}&contentId=${song.contentId}&toneFlag=${toneFlag}&resourceType=${song.resourceType}&userId=15548614588710179085069&netType=00`;
-        }
-        else {
-            let urlObj = new URL(resources[0].url);
-            urlObj.protocol = 'http';
-            urlObj.hostname = 'freetyst.nf.migu.cn';
-            item.bestQualityUrl = urlObj.href;
-            item.bestQualityformatType = resources[0].formatType;
-        }
-    }
-    return item
+export function songItemformat(song: any) {
+	let item = {
+		id: song.songId,
+		name: dealSongName(song.songName || song.name),
+		album: song.album || song.albums && song.albums[0],
+		artists: song.singer || song.singers,
+		contentId: song.contentId,
+		bestQualityformatType: '',
+		bestQualityUrl: ''
+	};
+	let resources = song.newRateFormats.map((detail: any) => ({
+		formatType: detail.formatType,
+		url: encodeURI(detail.url || detail.androidUrl),
+	}))
+	if (resources.length > 0) {
+		resources.sort((a: { formatType: string }, b: { formatType: string }) => {
+			return formatTypePriority(a.formatType) - formatTypePriority(b.formatType)
+		})
+		let tageturl = resources[0].url
+		if (tageturl.startsWith('$')) {
+			item.bestQualityformatType = resources[0].formatType;
+			let toneFlag = item.bestQualityformatType
+			item.bestQualityUrl = `https://app.pd.nf.migu.cn/MIGUM3.0/v1.0/content/sub/listenSong.do?channel=mx&copyrightId=${song.copyrightId}&contentId=${song.contentId}&toneFlag=${toneFlag}&resourceType=${song.resourceType}&userId=15548614588710179085069&netType=00`;
+		}
+		else {
+			let urlObj = new URL(resources[0].url);
+			urlObj.protocol = 'http';
+			urlObj.hostname = 'freetyst.nf.migu.cn';
+			item.bestQualityUrl = urlObj.href;
+			item.bestQualityformatType = resources[0].formatType;
+		}
+	}
+	return item
 };
-function formatTypePriority(formatType:string) {
-    return ['SQ', 'HQ', 'PQ', 'LQ', 'ZQ'].indexOf(formatType)
+function formatTypePriority(formatType: string) {
+	return ['SQ', 'HQ', 'PQ', 'LQ', 'ZQ'].indexOf(formatType)
 }
-function dealSongName(songName:string) {
-    if (songName.endsWith('曲)') || songName.endsWith('原声带)') || songName.endsWith('背景音乐)')) {
-        let splits = songName.split('(')
-        if (splits.length > 2) {
-            splits.pop()
-            songName = splits.join('(')
-        }
-        else {
-            songName = splits[0]
-        }
-    }
+function dealSongName(songName: string) {
+	if (songName.endsWith('曲)') || songName.endsWith('原声带)') || songName.endsWith('背景音乐)')) {
+		let splits = songName.split('(')
+		if (splits.length > 2) {
+			splits.pop()
+			songName = splits.join('(')
+		}
+		else {
+			songName = splits[0]
+		}
+	}
 
-    songName = songName.replace('(Live版)', '(Live)')
-    songName = songName.replace('（Live）', '(Live)')
-    songName = songName.replace('(live版)', '(Live)')
-    songName = songName.replace('(现场版)', '(Live)')
-    songName = songName.replace('(数字专辑)', '')
-    songName = songName.trim()
-    return songName
-}
-
-async function getSingerSongs(id:string) {
-    let songList = []
-    let url = `https://app.c.nf.migu.cn/MIGUM3.0/v1.0/template/song-list/release?pageNo=1&pageSize=50&singerId=${id}&songType=0&templateVersion=1`
-    while (true) {
-        let response = await axios.get(url)
-        // console.log(response.data.data.contentItemList[0].itemList)
-        let itemlist = response.data.data.contentItemList[0].itemList
-
-        for (let item of itemlist) {
-            if (item.song) {
-                songList.push(songItemformat(item.song))
-            }
-        }
-
-        if (response.data.data.nextPageUrl) {
-            url = response.data.data.nextPageUrl
-        }
-        else {
-            break;
-        }
-    }
-    console.log(songList)
-    return songList
+	songName = songName.replace('(Live版)', '(Live)')
+		.replace('（Live）', '(Live)')
+		.replace('(live版)', '(Live)')
+		.replace('(现场版)', '(Live)')
+		.replace('(数字专辑)', '')
+		// .replace(/\s*\(/, '(')
+		.trim()
+		
+	return songName
 }
 
-export async function getSingerAlbumsSongs(id:string) {
-    let songList = []
-    let albumList = await getSingerAlbums(id)
-    for (let album of albumList){
-        let albumSongs=await getAlbumSongs(album.id,album.resourceType)
-        songList.push(...albumSongs)
-    }
-    return songList
+async function getSingerSongs(id: string) {
+	let songList = []
+	let url = `https://app.c.nf.migu.cn/MIGUM3.0/v1.0/template/song-list/release?pageNo=1&pageSize=50&singerId=${id}&songType=0&templateVersion=1`
+	while (true) {
+		let response = await axios.get(url)
+		// console.log(response.data.data.contentItemList[0].itemList)
+		let itemlist = response.data.data.contentItemList[0].itemList
+
+		for (let item of itemlist) {
+			if (item.song) {
+				songList.push(songItemformat(item.song))
+			}
+		}
+
+		if (response.data.data.nextPageUrl) {
+			url = response.data.data.nextPageUrl
+		}
+		else {
+			break;
+		}
+	}
+	console.log(songList)
+	return songList
 }
 
-async function getSingerAlbums(id:string) {
-    let albumList = []
-    let url = `https://app.c.nf.migu.cn/MIGUM3.0/v1.0/template/singerAlbum/release?singerId=${id}&templateVersion=1`
-    while (true) {
-        let response = await axios.get(url)
-        // console.log(response.data.data)
-        let itemlist = response.data.data.contentItemList[1].itemList
-
-        for (let item of itemlist) {
-            if (item.title) {
-                albumList.push({ name: item.title, id: item.actionUrl.match(/(\d*?)$/)[0],resourceType : item.actionUrl.startsWith('mgmusic://album-info')?'2003':'5' })
-            }
-        }
-
-        if (response.data.data.nextPageUrl) {
-            url = response.data.data.nextPageUrl
-        }
-        else {
-            break;
-        }
-    }
-    // console.log(albumList)
-    return albumList
+export async function getSingerAlbumsSongs(id: string) {
+	let songList = []
+	let albumList = await getSingerAlbums(id)
+	for (let album of albumList) {
+		let albumSongs = await getAlbumSongs(album.id, album.resourceType)
+		songList.push(...albumSongs)
+	}
+	return songList
 }
-export async function getAlbumSongs(id:string,resourceType:string) {
-    //resourceType:2003:普通专辑 5:数字专辑
-    let songList = []
-    // backUP:https://app.c.nf.migu.cn/MIGUM3.0/resource/album/song/v2.0?albumId=600927015009000351
-    // backup:https://app.c.nf.migu.cn/MIGUM2.0/v1.0/content/queryAlbumSong?albumId=${id}&pageNo=1
-    let url=`https://app.c.nf.migu.cn/MIGUM2.0/v1.0/content/resourceinfo.do?needSimple=01&resourceId=${id}&resourceType=${resourceType}`
-    let response = await axios.get(url)
-    if (response.data.resource[0] && response.data.resource[0].songItems){
-        for (let item of response.data.resource[0].songItems){
-            songList.push(songItemformat(item))
-        }
-    }
-    return songList
+
+async function getSingerAlbums(id: string) {
+	let albumList = []
+	let url = `https://app.c.nf.migu.cn/MIGUM3.0/v1.0/template/singerAlbum/release?singerId=${id}&templateVersion=1`
+	while (true) {
+		let response = await axios.get(url)
+		// console.log(response.data.data)
+		let itemlist = response.data.data.contentItemList[1].itemList
+
+		for (let item of itemlist) {
+			if (item.title) {
+				albumList.push({ name: item.title, id: item.actionUrl.match(/(\d*?)$/)[0], resourceType: item.actionUrl.startsWith('mgmusic://album-info') ? '2003' : '5' })
+			}
+		}
+
+		if (response.data.data.nextPageUrl) {
+			url = response.data.data.nextPageUrl
+		}
+		else {
+			break;
+		}
+	}
+	// console.log(albumList)
+	return albumList
+}
+export async function getAlbumSongs(id: string, resourceType: string) {
+	//resourceType:2003:普通专辑 5:数字专辑
+	let songList = []
+	// backUP:https://app.c.nf.migu.cn/MIGUM3.0/resource/album/song/v2.0?albumId=600927015009000351
+	// backup:https://app.c.nf.migu.cn/MIGUM2.0/v1.0/content/queryAlbumSong?albumId=${id}&pageNo=1
+	let url = `https://app.c.nf.migu.cn/MIGUM2.0/v1.0/content/resourceinfo.do?needSimple=01&resourceId=${id}&resourceType=${resourceType}`
+	let response = await axios.get(url)
+	if (response.data.resource[0] && response.data.resource[0].songItems) {
+		for (let item of response.data.resource[0].songItems) {
+			songList.push(songItemformat(item))
+		}
+	}
+	return songList
 }

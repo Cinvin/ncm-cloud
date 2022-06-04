@@ -328,7 +328,9 @@ async function handleTasks() {
   }
 }
 
-function handleReTryTask(taskIndex: number) {
+function handleReTryTask(taskItem: any) {
+  let taskIndex = taskList.data.indexOf(taskItem)
+  if (taskIndex<0) return
   statusDesc.value = '下载上传ing'
   working.value = true
   handleTask(taskIndex).finally(() => {
@@ -459,7 +461,7 @@ function handleTask(taskIndex: number, poolIndex = 0) {
       <el-table-column property="miguformatType" label="品质" />
       <el-table-column label="状态" sortable :sort-by="['sort']">
         <template #default="scope">
-          <el-button v-if="scope.row.sort == 4" :disabled="working" @click="handleReTryTask(scope.$index)">重试
+          <el-button v-if="scope.row.sort == 4" :disabled="working" @click="handleReTryTask(scope.row)">重试
           </el-button>
           <el-progress v-if="scope.row.sort == 2" :percentage="scope.row.progress"></el-progress>
           {{ scope.row.status }}
