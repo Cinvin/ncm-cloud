@@ -4,7 +4,7 @@ import { Search } from '@element-plus/icons-vue'
 import { getSearch } from '../api/search'
 import { searchSinger, searchAlbum, searchSong, songItemformat } from '../api/migu'
 import { generateSingerTasks, generateAlbumTasks } from '../utils/migu2ncm'
-import { uploadSong, cloudDiskTrackMatch } from '../api/cloud'
+import { uploadSong, cloudDiskTrackMatch, cloudDiskTrackDelete } from '../api/cloud'
 import { useMessageStore } from '../stores/message'
 import { useTaskStatusStore } from '../stores/taskStatus'
 import { storeToRefs } from 'pinia'
@@ -87,7 +87,7 @@ let limitOption = reactive({
   FLAC: false,
 })
 
-let taskListData: { ncmSongId: any; migucontentId: any; miguURL: string; miguformatType: string; songName: any; albumName: any; artists: any; isInCloud: boolean; isNoCopyRight: boolean; isVIP: boolean; status: string; sort: number; progress: number; }[]
+let taskListData: { ncmSongId: any; migucontentId: any; miguURL: string; miguformatType: string; miguFileType: string; songName: any; albumName: any; artists: any; isInCloud: boolean; isNoCopyRight: boolean; isVIP: boolean; status: string; sort: number; progress: number; }[]
 taskListData = []
 let taskList = reactive({
   data: taskListData,
@@ -283,10 +283,11 @@ function handleStart() {
       migucontentId: miguSongTaget.songItem.contentId,
       miguURL: miguSongTaget.songItem.bestQualityUrl,
       miguformatType: miguSongTaget.songItem.bestQualityformatType,
+      miguFileType: miguSongTaget.songItem.bestQualityFileType,
       songName: miguSongTaget.name,
       albumName: miguSongTaget.songItem.album.name,
       artists: miguSongTaget.songItem.artists.map((a: { name: any }) => { return a.name }).toString(),
-      isInCloud: false,
+      isInCloud: true,
       isNoCopyRight: false,
       isVIP: false,
       status: '未开始',
@@ -330,7 +331,7 @@ async function handleTasks() {
 
 function handleReTryTask(taskItem: any) {
   let taskIndex = taskList.data.indexOf(taskItem)
-  if (taskIndex<0) return
+  if (taskIndex < 0) return
   statusDesc.value = '下载上传ing'
   working.value = true
   handleTask(taskIndex).finally(() => {
@@ -343,6 +344,7 @@ function handleTask(taskIndex: number, poolIndex = 0) {
   let task = taskList.data[taskIndex]
   task.status = '下载中'
   task.sort = 2
+
   return axios.get(task.miguURL,
     {
       responseType: "blob",
@@ -361,14 +363,17 @@ function handleTask(taskIndex: number, poolIndex = 0) {
         task.sort = 4
         return poolIndex
       }
+
+
+
       let content = res.data
-      let fileName = task.miguformatType == 'SQ' ? `${task.songName}.flac` : `${task.songName}.mp3`
-      console.log('before fileObj')
-      let fileObj = new File([content], fileName,{type:content.type})
+      let fileName = `${task.songName}.${task.miguFileType}`
+
+      let fileObj = new File([content], fileName, { type: content.type })
       console.log(fileObj)
       task.status = '上传中'
       task.sort = 1
-      await uploadSong(fileObj).then((res: any) => {
+      await uploadSong(fileObj).then(async (res: any) => {
         console.log(res)
         if (res.code && res.code !== 200 && res.message) {
           MessageStore.send(res.message, 'warning')
@@ -377,10 +382,20 @@ function handleTask(taskIndex: number, poolIndex = 0) {
         }
         else {
           task.status = '已上传'
-          cloudDiskTrackMatch({ sid: res.privateCloud.songId, asid: task.ncmSongId }).then(() => {
+          if (res.privateCloud.songId != task.ncmSongId) {
+            if (task.isInCloud) {
+              await cloudDiskTrackDelete(task.ncmSongId)
+              task.isInCloud = false
+            }
+            cloudDiskTrackMatch({ sid: res.privateCloud.songId, asid: task.ncmSongId }).then(() => {
+              task.status = '已完成'
+              task.sort = 5
+            })
+          }
+          else{
             task.status = '已完成'
-            task.sort = 5
-          })
+              task.sort = 5
+          }
         }
         // return poolIndex
       })

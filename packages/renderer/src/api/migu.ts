@@ -128,19 +128,24 @@ export function songItemformat(song: any) {
 		artists: song.singer || song.singers,
 		contentId: song.contentId,
 		bestQualityformatType: '',
-		bestQualityUrl: ''
+		bestQualityUrl: '',
+		bestQualitySize: '',
+		bestQualityFileType: '',
 	};
 	let resources = song.newRateFormats.map((detail: any) => ({
 		formatType: detail.formatType,
 		url: encodeURI(detail.url || detail.androidUrl),
+		size: Number(detail.androidSize || detail.size),
+		fileType: detail.androidFileType || detail.fileType,
 	}))
 	if (resources.length > 0) {
-		resources.sort((a: { formatType: string }, b: { formatType: string }) => {
-			return formatTypePriority(a.formatType) - formatTypePriority(b.formatType)
+		resources.sort((a: { size:number }, b: { size:number }) => {
+			// return formatTypePriority(a.formatType) - formatTypePriority(b.formatType)
+			return b.size - a.size
 		})
 		let tageturl = resources[0].url
 		if (tageturl.startsWith('$')) {
-			item.bestQualityformatType = resources[0].formatType;
+			
 			let toneFlag = item.bestQualityformatType
 			item.bestQualityUrl = `https://app.pd.nf.migu.cn/MIGUM3.0/v1.0/content/sub/listenSong.do?channel=mx&copyrightId=${song.copyrightId}&contentId=${song.contentId}&toneFlag=${toneFlag}&resourceType=${song.resourceType}&userId=15548614588710179085069&netType=00`;
 		}
@@ -149,13 +154,15 @@ export function songItemformat(song: any) {
 			urlObj.protocol = 'http';
 			urlObj.hostname = 'freetyst.nf.migu.cn';
 			item.bestQualityUrl = urlObj.href;
-			item.bestQualityformatType = resources[0].formatType;
 		}
+		item.bestQualityformatType = resources[0].formatType;
+		item.bestQualitySize = resources[0].size;
+		item.bestQualityFileType = resources[0].fileType;
 	}
 	return item
 };
 function formatTypePriority(formatType: string) {
-	return ['SQ', 'HQ', 'PQ', 'LQ', 'ZQ'].indexOf(formatType)
+	return ['ZQ', 'SQ', 'HQ', 'PQ', 'LQ'].indexOf(formatType)
 }
 function dealSongName(songName: string) {
 	if (songName.endsWith('曲)') || songName.endsWith('原声带)') || songName.endsWith('背景音乐)')) {

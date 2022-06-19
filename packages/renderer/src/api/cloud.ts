@@ -40,13 +40,18 @@ export function cloudDisk(params:{ limit: number, offset: number, [timestamp: st
 /**
  * 获取云盘歌曲详情（需要登录）
  */
-export function cloudDiskTrackDetail(id: number) {
+export function cloudDiskTrackDetail(id: number[]) {
+    let idstr=''
+    for (let iditem of id){
+        idstr+=iditem.toString()+','
+    }
+    idstr= idstr.substring(0,idstr.length - 1)
     return request({
         url: '/user/cloud/detail',
         method: 'get',
         params: {
             timestamp: new Date().getTime(),
-            id,
+            id: idstr
         },
     });
 }

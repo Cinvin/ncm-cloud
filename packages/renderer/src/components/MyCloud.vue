@@ -172,7 +172,7 @@ function onClickDelete(songItem: any) {
         <div class="song-info">
           <img v-if="scope.row.simpleSong.al" :src="scope.row.simpleSong.al.picUrl + '?param=50y50'" class="song-img"
             lazy />
-          <img v-else src="http://p4.music.126.net/UeTuwE7pvjBpypWLudqukA==/3132508627578625.jpg?param=50y50">
+          <img v-else src="http://p4.music.126.net/UeTuwE7pvjBpypWLudqukA==/3132508627578625.jpg?param=50y50" lazy />
           <div class="song-info-cont">
             <div class="ellipsis-text">{{ scope.row.simpleSong.name }}</div>
             <div class="ellipsis-text">
@@ -191,7 +191,7 @@ function onClickDelete(songItem: any) {
     <!-- <el-table-column prop="simpleSong.al.name" label="专辑" width="180" show-overflow-tooltip/> -->
     <el-table-column label="专辑" width="180">
       <template #default="scope">
-        <template v-if="scope.row.simpleSong.al && scope.row.simpleSong.al.id > 0">{{ scope.row.simpleSong.al.name
+        <template v-if="scope.row.simpleSong.al && scope.row.simpleSong.al.name.length > 0">{{ scope.row.simpleSong.al.name
         }}</template>
         <template v-else>{{ scope.row.album }}</template>
       </template>
