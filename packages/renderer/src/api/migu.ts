@@ -121,15 +121,17 @@ export function searchSong(keyword: string) {
 }
 
 export function songItemformat(song: any) {
+	let songName = dealSongName(song.songName || song.name)
 	let item = {
 		id: song.songId,
-		name: dealSongName(song.songName || song.name),
+		name: songName,
+		subName: getSubSongName(songName),
 		album: song.album || song.albums && song.albums[0],
 		artists: song.singer || song.singers,
 		contentId: song.contentId,
 		bestQualityformatType: '',
 		bestQualityUrl: '',
-		bestQualitySize: '',
+		bestQualitySize: 0,
 		bestQualityFileType: '',
 	};
 	let resources = song.newRateFormats.map((detail: any) => ({
@@ -139,13 +141,13 @@ export function songItemformat(song: any) {
 		fileType: detail.androidFileType || detail.fileType,
 	}))
 	if (resources.length > 0) {
-		resources.sort((a: { size:number }, b: { size:number }) => {
+		resources.sort((a: { size: number }, b: { size: number }) => {
 			// return formatTypePriority(a.formatType) - formatTypePriority(b.formatType)
 			return b.size - a.size
 		})
 		let tageturl = resources[0].url
 		if (tageturl.startsWith('$')) {
-			
+
 			let toneFlag = item.bestQualityformatType
 			item.bestQualityUrl = `https://app.pd.nf.migu.cn/MIGUM3.0/v1.0/content/sub/listenSong.do?channel=mx&copyrightId=${song.copyrightId}&contentId=${song.contentId}&toneFlag=${toneFlag}&resourceType=${song.resourceType}&userId=15548614588710179085069&netType=00`;
 		}
@@ -161,9 +163,7 @@ export function songItemformat(song: any) {
 	}
 	return item
 };
-function formatTypePriority(formatType: string) {
-	return ['ZQ', 'SQ', 'HQ', 'PQ', 'LQ'].indexOf(formatType)
-}
+
 function dealSongName(songName: string) {
 	if (songName.endsWith('曲)') || songName.endsWith('原声带)') || songName.endsWith('背景音乐)')) {
 		let splits = songName.split('(')
@@ -176,14 +176,28 @@ function dealSongName(songName: string) {
 		}
 	}
 
-	songName = songName.replace('(Live版)', '(Live)')
-		.replace('（Live）', '(Live)')
-		.replace('(live版)', '(Live)')
-		.replace('(现场版)', '(Live)')
-		.replace('(数字专辑)', '')
-		// .replace(/\s*\(/, '(')
+	songName = songName
+		// .replace('(Live版)', '(Live)')
+		// .replace('（Live）', '(Live)')
+		// .replace('(live版)', '(Live)')
+		// .replace('(现场版)', '(Live)')
+		// .replace('(数字专辑)', '')
+		.replace(/\s*\(/, '(')
 		.trim()
-		
+
+	return songName
+}
+
+function getSubSongName(songName: string) {
+	if (songName.indexOf('(') >= 0) {
+		songName = songName.split('(')[0].trim()
+	}
+	if (songName.indexOf('（') >= 0) {
+		songName = songName.split('（')[0].trim()
+	}
+	if (songName.match(/^《.*?》$/)) {
+		songName = songName.slice(1, -1).trim()
+	}
 	return songName
 }
 
@@ -197,7 +211,10 @@ async function getSingerSongs(id: string) {
 
 		for (let item of itemlist) {
 			if (item.song) {
-				songList.push(songItemformat(item.song))
+				let songObj = songItemformat(item.song)
+				if (songObj.bestQualitySize > 0) {
+					songList.push(songObj)
+				}
 			}
 		}
 
@@ -255,7 +272,10 @@ export async function getAlbumSongs(id: string, resourceType: string) {
 	let response = await axios.get(url)
 	if (response.data.resource[0] && response.data.resource[0].songItems) {
 		for (let item of response.data.resource[0].songItems) {
-			songList.push(songItemformat(item))
+			let songObj = songItemformat(item)
+			if (songObj.bestQualitySize > 0) {
+				songList.push(songObj)
+			}
 		}
 	}
 	return songList

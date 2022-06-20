@@ -18,16 +18,23 @@ export function generateSingerTasks(ncmId: number, miguId: string,
         let inCloudIdList=[]
         let contentIdList=[]
         for (let ncmSong of ncmSongs){
+
+            let ncmSongSubName=''
+            if (ncmSong.name.indexOf('(')>=0){
+                ncmSongSubName=ncmSong.name.split('(')[0].trim()
+                if (ncmSongs.find((song)=>{
+                    return song.name.startsWith(ncmSongSubName) && song.al.id==song.al.id && song.id!=ncmSong.id
+                })){
+                    ncmSongSubName=''
+                }
+            }
+
             let find=miguSongs.find((song)=>{
                 // console.log(song.artists.split('|').sort().toString(),ncmSong.ar.map((artist)=>(artist.name)).sort().toString())
-                return song.name == ncmSong.name
+                return (song.name == ncmSong.name || song.subName == ncmSongSubName)
                  && song.album == ncmSong.al.name
                  && song.artists.split('|').sort().toString()==ncmSong.ar.map((artist: { name: any; })=>(artist.name)).sort().toString()
             })
-            if (ncmSong.al.name=='Mojito'){
-                console.log(ncmSong)
-                console.log(find)
-            }
             if (find){
                 let findmatch=contentIdList.find((match)=>{
                     return match==find?.contentId 
@@ -110,14 +117,23 @@ export function generateAlbumTasks(ncmId: number, miguId: string,miguresourceTyp
         let inCloudIdList=[]
         let contentIdList=[]
         for (let ncmSong of ncmSongs){
-            //已在云盘 跳过
-            // if(ncmSong.privilege.cs){
-            //     continue
-            // }
-            let find=miguSongs.find((song: { name: any; artists: { split: (arg0: string) => { (): any; new(): any; sort: { (): { (): any; new(): any; toString: { (): any; new(): any; }; }; new(): any; }; }; }; })=>{
-                return song.name == ncmSong.name
+            
+            let ncmSongSubName=''
+            if (ncmSong.name.indexOf('(')>=0){
+                ncmSongSubName=ncmSong.name.split('(')[0].trim()
+                if (ncmSongs.find((song: { name: string; id: any; })=>{
+                    return song.name.startsWith(ncmSongSubName) && song.id!=ncmSong.id
+                })){
+                    ncmSongSubName=''
+                }
+            }
+
+
+            let find=miguSongs.find((song: { name: any; subName: string; artists: { split: (arg0: string) => { (): any; new(): any; sort: { (): { (): any; new(): any; toString: { (): any; new(): any; }; }; new(): any; }; }; }; })=>{
+                return (song.name == ncmSong.name || song.subName == ncmSongSubName)
                  && song.artists.split('|').sort().toString()==ncmSong.ar.map((artist: { name: any; })=>(artist.name)).sort().toString()
             })
+
             if (find){
                 let findmatch=contentIdList.find((match)=>{
                     return match==find?.contentId 
