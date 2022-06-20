@@ -33,7 +33,7 @@ export function generateSingerTasks(ncmId: number, miguId: string,
                 // console.log(song.artists.split('|').sort().toString(),ncmSong.ar.map((artist)=>(artist.name)).sort().toString())
                 return (song.name == ncmSong.name || song.subName == ncmSongSubName)
                  && song.album == ncmSong.al.name
-                 && song.artists.split('|').sort().toString()==ncmSong.ar.map((artist: { name: any; })=>(artist.name)).sort().toString()
+                //  && song.artists.split('|').sort().toString()==ncmSong.ar.map((artist: { name: any; })=>(artist.name)).sort().toString()
             })
             if (find){
                 let findmatch=contentIdList.find((match)=>{
@@ -131,7 +131,7 @@ export function generateAlbumTasks(ncmId: number, miguId: string,miguresourceTyp
 
             let find=miguSongs.find((song: { name: any; subName: string; artists: { split: (arg0: string) => { (): any; new(): any; sort: { (): { (): any; new(): any; toString: { (): any; new(): any; }; }; new(): any; }; }; }; })=>{
                 return (song.name == ncmSong.name || song.subName == ncmSongSubName)
-                 && song.artists.split('|').sort().toString()==ncmSong.ar.map((artist: { name: any; })=>(artist.name)).sort().toString()
+                //  && song.artists.split('|').sort().toString()==ncmSong.ar.map((artist: { name: any; })=>(artist.name)).sort().toString()
             })
 
             if (find){
