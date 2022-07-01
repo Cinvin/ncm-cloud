@@ -30,7 +30,7 @@
     "unplugin-icons": "^0.14.3",
     "unplugin-vue-components": "^0.19.5",
     "vite": "^2.9.8",
-    "vite-plugin-electron": "^0.4.3",
+    "vite-plugin-electron": "^0.6.2",
     "vite-plugin-resolve": "^2.0.8",
     "vue": "^3.2.33",
     "vue-tsc": "^0.34.11"
