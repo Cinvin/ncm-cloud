@@ -191,7 +191,7 @@ function onClickDelete(songItem: any) {
     <!-- <el-table-column prop="simpleSong.al.name" label="专辑" width="180" show-overflow-tooltip/> -->
     <el-table-column label="专辑" width="180">
       <template #default="scope">
-        <template v-if="scope.row.simpleSong.al && scope.row.simpleSong.al.name.length > 0">{{ scope.row.simpleSong.al.name
+        <template v-if="scope.row.simpleSong.al">{{ scope.row.simpleSong.al.name
         }}</template>
         <template v-else>{{ scope.row.album }}</template>
       </template>
@@ -224,7 +224,7 @@ function onClickDelete(songItem: any) {
     :page-size="cloud.limit" v-model:current-page="cloud.page_index" />
 
   <el-dialog v-model="dialogConnection" :before-close="dialogConnectionBeforeClose" title="匹配歌曲">
-    <el-input v-model="searchTable.keyword" placeholder="Search" @blur="handleMatchSearch">
+    <el-input v-model="searchTable.keyword" placeholder="Search" @keyup.enter="handleMatchSearch">
       <template #prefix>
         <el-icon class="el-input__icon">
           <Search />
