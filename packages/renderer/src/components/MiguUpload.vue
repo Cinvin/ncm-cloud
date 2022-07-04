@@ -287,7 +287,7 @@ function handleStart() {
       songName: miguSongTaget.name,
       albumName: miguSongTaget.songItem.album.name,
       artists: miguSongTaget.songItem.artists.map((a: { name: any }) => { return a.name }).toString(),
-      isInCloud: true,
+      isInCloud: false,
       isNoCopyRight: false,
       isVIP: false,
       status: '未开始',
