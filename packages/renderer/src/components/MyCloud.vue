@@ -163,7 +163,7 @@ function onClickDelete(songItem: any) {
 <template>
   <div v-if="cloud.size">
     <el-progress :percentage="100 * Number(cloud.size) / Number(cloud.maxSize)">
-      {{ fileSizeDesc(Number(cloud.size)) + '/' + fileSizeDesc(Number(cloud.maxSize)) + ' 共' + cloud.count + '首'}}
+      {{ fileSizeDesc(Number(cloud.size)) + '/' + fileSizeDesc(Number(cloud.maxSize)) + ' 共' + cloud.count + '首' }}
     </el-progress>
   </div>
   <el-table :data="cloud.data" row-key="songId" v-loading="cloud.loading" style="width: 100%">
@@ -191,8 +191,7 @@ function onClickDelete(songItem: any) {
     <!-- <el-table-column prop="simpleSong.al.name" label="专辑" width="180" show-overflow-tooltip/> -->
     <el-table-column label="专辑" width="180">
       <template #default="scope">
-        <template v-if="scope.row.simpleSong.al">{{ scope.row.simpleSong.al.name
-        }}</template>
+        <template v-if="scope.row.simpleSong.al.name">{{ scope.row.simpleSong.al.name }}</template>
         <template v-else>{{ scope.row.album }}</template>
       </template>
     </el-table-column>
