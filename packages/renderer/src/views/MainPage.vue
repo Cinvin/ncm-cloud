@@ -19,8 +19,13 @@ let profile = reactive({
 
 onMounted(() => {
   loginStatus().then((res) => {
-    profile.nickname = res.data.profile.nickname
-    profile.avatarUrl = res.data.profile.avatarUrl
+    if (res.data.profile){
+      profile.nickname = res.data.profile.nickname
+      profile.avatarUrl = res.data.profile.avatarUrl
+    }
+    else{
+      logout()
+    }
   })
 })
 
