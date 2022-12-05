@@ -20,6 +20,10 @@ let formEmail = reactive({
   password: '',
 })
 
+let formCookie = reactive({
+  MUSIC_U: '',
+})
+
 let qrCode = reactive({
   key: '',
   svg: '',
@@ -138,7 +142,20 @@ function handleLoginResponse(this: any, data: any) {
     messageStore.send(data.msg ?? data.message ?? '账号或密码错误，请检查', 'error')
   }
 }
-
+// Cookie
+function onCookieSubmit() {
+  if (!formCookie.MUSIC_U) {
+    const msg = '请设置MUSIC_U'
+    messageStore.send(msg, 'error')
+    throw new Error(msg)
+  }
+  handleLoginResponse(
+    {
+      code : 200,
+      cookie : `MUSIC_U=${formCookie.MUSIC_U}`
+    }
+    )
+}
 getQrCodeKey()
 </script>
 
@@ -178,6 +195,17 @@ getQrCodeKey()
             </el-form-item>
             <el-form-item>
               <el-button type="primary" @click="onEmailSubmit">登录</el-button>
+            </el-form-item>
+          </el-form>
+        </el-tab-pane>
+        <el-tab-pane label="Cookie" name="cookiepane">
+          <el-form label-width="100px" :model="formEmail" style="max-width: 460px">
+            <el-form-item label="MUSIC_U">
+              <el-input v-model="formCookie.MUSIC_U" />
+            </el-form-item>
+            <label>*请输入网易云音乐网页端Cookie中MUSIC_U对应的值</label>
+            <el-form-item>
+              <el-button type="primary" @click="onCookieSubmit">登录</el-button>
             </el-form-item>
           </el-form>
         </el-tab-pane>
