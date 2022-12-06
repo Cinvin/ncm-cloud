@@ -119,7 +119,7 @@ function checkQrCodeLogin() {
 onDeactivated(() => {
   clearInterval(qrCodeCheckInterval);
 })
-function modeChange(tabname: string) {
+function modeChange(tabname: any) {
   if (tabname === 'qrCode') {
     checkQrCodeLogin();
   } else {

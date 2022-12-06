@@ -377,36 +377,48 @@ function handleTask(taskIndex: number, poolIndex = 0) {
         console.log(res)
         if (res.code && res.code !== 200 && res.message) {
           MessageStore.send(res.message, 'warning')
-          task.status = '上传失败 ' + res.message
+          task.status = '上传失败:' + res.message
           task.sort = 4
         }
         else {
           task.status = '已上传'
           if (res.privateCloud.songId != task.ncmSongId) {
             if (task.isInCloud) {
-              await cloudDiskTrackDelete(task.ncmSongId)
-              task.isInCloud = false
+              cloudDiskTrackDelete(task.ncmSongId)
+                .then(() => {
+                  task.isInCloud = false
+                  cloudDiskTrackMatch({ sid: res.privateCloud.songId, asid: task.ncmSongId }).then(() => {
+                    task.status = '已完成'
+                    task.sort = 5
+                  })
+                })
+                .catch((err) => {
+                  task.status = '上传失败:' + err
+                  task.sort = 4
+                })
             }
-            cloudDiskTrackMatch({ sid: res.privateCloud.songId, asid: task.ncmSongId }).then(() => {
-              task.status = '已完成'
-              task.sort = 5
-            })
+            else {
+              cloudDiskTrackMatch({ sid: res.privateCloud.songId, asid: task.ncmSongId }).then(() => {
+                task.status = '已完成'
+                task.sort = 5
+              })
+            }
           }
-          else{
+          else {
             task.status = '已完成'
-              task.sort = 5
+            task.sort = 5
           }
         }
         // return poolIndex
       })
         .catch((err) => {
-          task.status = '上传失败 ' + err
+          task.status = '上传失败:' + err
           task.sort = 4
         })
       return poolIndex
     })
     .catch((err) => {
-      task.status = '下载失败 ' + err
+      task.status = '下载失败:' + err
       task.sort = 4
       return poolIndex
     })
@@ -469,7 +481,7 @@ function handleTask(taskIndex: number, poolIndex = 0) {
   </el-row>
 
   <el-row v-if="taskList.data.length > 0">
-    <el-table :data="taskList.data" :default-sort="{ prop: 'sort' }">
+    <el-table :data="taskList.data">
       <el-table-column property="songName" label="歌名" />
       <el-table-column property="artists" label="歌手" />
       <el-table-column property="albumName" label="专辑" />
@@ -553,4 +565,5 @@ function handleTask(taskIndex: number, poolIndex = 0) {
 </template>
 
 <style scoped>
+
 </style>
