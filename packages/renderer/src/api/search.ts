@@ -37,3 +37,5 @@ export async function getstrictSearch(artists: string[], album: string, songName
     }
     return null
 }
+
+export const getCloudSearch = (params: any) => request.get(`/cloudsearch`, { params })

@@ -41,7 +41,6 @@ declare module '@vue/runtime-core' {
     MyCloud: typeof import('./src/components/MyCloud.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
-    vLoading: typeof import('element-plus/es')['ElLoadingDirective']
   }
 }
 

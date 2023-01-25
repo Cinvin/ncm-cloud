@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { ref, reactive, computed } from 'vue'
-import { Search } from '@element-plus/icons-vue'
-import { getSearch } from '../api/search'
+import { getSearch, getCloudSearch } from '../api/search'
 import { searchSinger, searchAlbum, searchSong, songItemformat } from '../api/migu'
 import { generateSingerTasks, generateAlbumTasks } from '../utils/migu2ncm'
 import { uploadSong, cloudDiskTrackMatch, cloudDiskTrackDelete } from '../api/cloud'
@@ -15,7 +14,7 @@ let MessageStore = useMessageStore()
 let TaskStatusStore = useTaskStatusStore()
 let { working } = storeToRefs(TaskStatusStore)
 let itemType = ref(1)
-let selectorData: { name: string, id: number }[] = []
+let selectorData: { name: string, id: number, obj: any }[] = []
 let dialogSelector = reactive({
   visiable: false,
   data: selectorData,
@@ -25,7 +24,6 @@ let dialogSelector = reactive({
   platform: '',
   keyword: '',
   resourceType: '',
-  miguSongItem: {},
 })
 
 let miguSingerTaget = reactive({
@@ -47,7 +45,7 @@ let miguAlbumTaget = reactive({
   id: '',
   name: '',
   resourceType: '',
-  link() {
+link() {
     if (this.resourceType == '2003') {
       return `https://music.migu.cn/v3/music/album/${this.id}`
     }
@@ -109,14 +107,12 @@ function fetchDialogData() {
     if (dialogSelector.platform === 'ncm') {
       getSearch({ keywords: dialogSelector.keyword, type: 100, limit: 10 })
         .then((res: any) => {
-          console.log(res)
           dialogSelector.data = res.result.artists
         })
     }
     else {
       searchSinger(dialogSelector.keyword)
         .then((res: any) => {
-          console.log(res)
           dialogSelector.data = res
         })
     }
@@ -125,30 +121,12 @@ function fetchDialogData() {
     if (dialogSelector.platform === 'ncm') {
       getSearch({ keywords: dialogSelector.keyword, type: 10, limit: 10 })
         .then((res: any) => {
-          console.log(res)
           dialogSelector.data = res.result.albums
         })
     }
     else {
       searchAlbum(dialogSelector.keyword)
         .then((res: any) => {
-          console.log(res)
-          dialogSelector.data = res
-        })
-    }
-  }
-  else if (itemType.value === 3) {
-    if (dialogSelector.platform === 'ncm') {
-      getSearch({ keywords: dialogSelector.keyword, type: 1, limit: 10 })
-        .then((res: any) => {
-          console.log(res)
-          dialogSelector.data = res.result.songs
-        })
-    }
-    else {
-      searchSong(dialogSelector.keyword)
-        .then((res: any) => {
-          console.log(res)
           dialogSelector.data = res
         })
     }
@@ -161,9 +139,6 @@ const handleSelectTableCurrentChange = (val: any | undefined) => {
     dialogSelector.selectedName = val.name
     if (dialogSelector.platform == 'migu' && val.resourceType) {
       dialogSelector.resourceType = val.resourceType
-    }
-    if (itemType.value == 3 && dialogSelector.platform == 'migu') {
-      dialogSelector.miguSongItem = songItemformat(val)
     }
   }
 }
@@ -178,11 +153,6 @@ function handleSelected() {
       miguAlbumTaget.name = dialogSelector.selectedName
       miguAlbumTaget.resourceType = dialogSelector.resourceType
     }
-    else if (itemType.value == 3) {
-      miguSongTaget.id = dialogSelector.selectedId.toString()
-      miguSongTaget.name = dialogSelector.selectedName
-      miguSongTaget.songItem = dialogSelector.miguSongItem
-    }
   }
   else if (dialogSelector.platform == 'ncm') {
     if (itemType.value == 1) {
@@ -193,10 +163,6 @@ function handleSelected() {
       ncmAlbumTaget.id = Number(dialogSelector.selectedId)
       ncmAlbumTaget.name = dialogSelector.selectedName
     }
-    else if (itemType.value == 3) {
-      ncmSongTaget.id = Number(dialogSelector.selectedId)
-      ncmSongTaget.name = dialogSelector.selectedName
-    }
   }
   autoFillAnother()
   dialogSelector.selectedId = ''
@@ -204,7 +170,6 @@ function handleSelected() {
   dialogSelector.platform = ''
   dialogSelector.keyword = ''
   dialogSelector.resourceType = ''
-  dialogSelector.miguSongItem = {}
   dialogSelector.data.splice(0, dialogSelector.data.length);
   dialogSelector.visiable = false
 }
@@ -214,7 +179,6 @@ const dialogBeforeClose = (done: () => void) => {
   dialogSelector.platform = ''
   dialogSelector.keyword = ''
   dialogSelector.resourceType = ''
-  dialogSelector.miguSongItem = {}
   dialogSelector.data.splice(0, dialogSelector.data.length);
   done()
 }
@@ -223,8 +187,7 @@ let startButtonDisabled = computed(() => {
   return working.value
     || (itemType.value == 1 && (miguSingerTaget.id == '' || ncmSingerTaget.id == 0))
     || (itemType.value == 2 && (miguAlbumTaget.id == '' || ncmAlbumTaget.id == 0))
-    || (itemType.value == 3 && (miguSongTaget.id == '' || ncmSongTaget.id == 0))
-    || (itemType.value != 3 && (!limitOption.CopyRight && !limitOption.FLAC && !limitOption.VIP))
+    || (!limitOption.CopyRight && !limitOption.FLAC && !limitOption.VIP)
 })
 
 function autoFillAnother() {
@@ -277,27 +240,6 @@ function handleStart() {
       handleTasks()
     })
   }
-  else if (itemType.value == 3) {
-    let matchItem = {
-      ncmSongId: ncmSongTaget.id,
-      migucontentId: miguSongTaget.songItem.contentId,
-      miguURL: miguSongTaget.songItem.bestQualityUrl,
-      miguformatType: miguSongTaget.songItem.bestQualityformatType,
-      miguFileType: miguSongTaget.songItem.bestQualityFileType,
-      songName: miguSongTaget.name,
-      albumName: miguSongTaget.songItem.album.name,
-      artists: miguSongTaget.songItem.artists.map((a: { name: any }) => { return a.name }).toString(),
-      isInCloud: false,
-      isNoCopyRight: false,
-      isVIP: false,
-      status: '未开始',
-      sort: 3,
-      progress: 0,
-    }
-    taskList.data = [matchItem]
-    handleTask(0)
-  }
-  console.log('working.value=false')
   working.value = false
 }
 async function handleTasks() {
@@ -357,7 +299,6 @@ function handleTask(taskIndex: number, poolIndex = 0) {
       }
     })
     .then(async (res) => {
-      console.log(res)
       if (res.status != 200) {
         task.status = '下载失败'
         task.sort = 4
@@ -370,11 +311,9 @@ function handleTask(taskIndex: number, poolIndex = 0) {
       let fileName = `${task.songName}.${task.miguFileType}`
 
       let fileObj = new File([content], fileName, { type: content.type })
-      console.log(fileObj)
       task.status = '上传中'
       task.sort = 1
       await uploadSong(fileObj).then(async (res: any) => {
-        console.log(res)
         if (res.code && res.code !== 200 && res.message) {
           MessageStore.send(res.message, 'warning')
           task.status = '上传失败:' + res.message
@@ -429,7 +368,6 @@ function handleTask(taskIndex: number, poolIndex = 0) {
   <el-radio-group v-model="itemType">
     <el-radio :label="1">歌手</el-radio>
     <el-radio :label="2">专辑</el-radio>
-    <el-radio :label="3">歌曲</el-radio>
   </el-radio-group>
   <el-row>
     <el-col :span="12">
@@ -441,9 +379,6 @@ function handleTask(taskIndex: number, poolIndex = 0) {
         <div v-else-if="itemType == 2 && miguAlbumTaget.id.length > 0">
           <el-link type="primary" @click="openExternal(miguAlbumTaget.link())">已选择：{{ miguAlbumTaget.name }}</el-link>
         </div>
-        <div v-else-if="itemType == 3 && miguSongTaget.id.length > 0">
-          <el-link type="primary" @click="openExternal(miguSongTaget.link())">已选择：{{ miguSongTaget.name }}</el-link>
-        </div>
       </el-row>
     </el-col>
     <el-col :span="12">
@@ -454,9 +389,6 @@ function handleTask(taskIndex: number, poolIndex = 0) {
         </div>
         <div v-else-if="itemType == 2 && ncmAlbumTaget.id > 0">
           <el-link type="primary" @click="openExternal(ncmAlbumTaget.link())">已选择：{{ ncmAlbumTaget.name }}</el-link>
-        </div>
-        <div v-else-if="itemType == 3 && ncmSongTaget.id > 0">
-          <el-link type="primary" @click="openExternal(ncmSongTaget.link())">已选择：{{ ncmSongTaget.name }}</el-link>
         </div>
       </el-row>
     </el-col>
@@ -519,37 +451,6 @@ function handleTask(taskIndex: number, poolIndex = 0) {
           </template>
           <template v-else>
             {{ scope.row.singer }}
-          </template>
-        </template>
-      </el-table-column>
-      <!-- 歌曲的歌手 -->
-      <el-table-column v-if="itemType == 3" label="歌手" width="200">
-        <template #default="scope">
-          <template v-if="dialogSelector.platform == 'ncm'">
-            <template v-for="(ar, index) in scope.row.artists" :key="index">
-              {{ ar.name }}
-              <template v-if="index !== scope.row.artists.length - 1" class="separator">,</template>
-            </template>
-          </template>
-          <template v-else>
-            <template v-for="(singer, index) in scope.row.singers" :key="index">
-              {{ singer.name }}
-              <template v-if="index !== scope.row.singers.length - 1" class="separator">,</template>
-            </template>
-          </template>
-        </template>
-      </el-table-column>
-      <!-- 歌曲的专辑 -->
-      <el-table-column v-if="itemType == 3" label="专辑" width="200">
-        <template #default="scope">
-          <template v-if="dialogSelector.platform == 'ncm'">
-            {{ scope.row.album.name }}
-          </template>
-          <template v-else>
-            <template v-for="(album, index) in scope.row.albums" :key="index">
-              {{ album.name }}
-              <template v-if="index !== scope.row.albums.length - 1" class="separator">,</template>
-            </template>
           </template>
         </template>
       </el-table-column>

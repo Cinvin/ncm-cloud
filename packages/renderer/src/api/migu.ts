@@ -146,7 +146,10 @@ export function songItemformat(song: any) {
 			return b.size - a.size
 		})
 		let tageturl = resources[0].url
-		if (tageturl.startsWith('$')) {
+		item.bestQualityformatType = resources[0].formatType;
+		item.bestQualitySize = resources[0].size;
+		item.bestQualityFileType = resources[0].fileType;
+		if (resources[0].url=='undefined') {
 
 			let toneFlag = item.bestQualityformatType
 			item.bestQualityUrl = `https://app.pd.nf.migu.cn/MIGUM3.0/v1.0/content/sub/listenSong.do?channel=mx&copyrightId=${song.copyrightId}&contentId=${song.contentId}&toneFlag=${toneFlag}&resourceType=${song.resourceType}&userId=15548614588710179085069&netType=00`;
@@ -157,9 +160,7 @@ export function songItemformat(song: any) {
 			urlObj.hostname = 'freetyst.nf.migu.cn';
 			item.bestQualityUrl = urlObj.href;
 		}
-		item.bestQualityformatType = resources[0].formatType;
-		item.bestQualitySize = resources[0].size;
-		item.bestQualityFileType = resources[0].fileType;
+		
 	}
 	return item
 };

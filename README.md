@@ -2,7 +2,7 @@
 ## 功能
 * 我的云盘文件（删除云盘文件，设置关联的歌曲）
 * 本地上传
-* 咪咕音源上传  
+* 咪咕音源上传  (按歌手或按专辑批量上传)
 
 ## 部分截图
 ![我的云盘](https://raw.githubusercontent.com/Cinvin/ncm-cloud/master/screenshots/MyCloud.png)  

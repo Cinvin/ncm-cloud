@@ -222,7 +222,7 @@ function onClickDelete(songItem: any) {
   <el-pagination background layout="prev, pager, next, jumper" v-if="cloud.count > cloud.limit" :total="cloud.count"
     :page-size="cloud.limit" v-model:current-page="cloud.page_index" />
 
-  <el-dialog v-model="dialogConnection" :before-close="dialogConnectionBeforeClose" title="设置关联歌曲">
+  <el-dialog v-model="dialogConnection" :before-close="dialogConnectionBeforeClose" title="设置匹配歌曲">
     <el-input v-model="searchTable.keyword" placeholder="Search" @keyup.enter="handleMatchSearch">
       <template #prefix>
         <el-icon class="el-input__icon">
