@@ -203,7 +203,7 @@ getQrCodeKey()
             <el-form-item label="MUSIC_U">
               <el-input v-model="formCookie.MUSIC_U" />
             </el-form-item>
-            <label>*请输入网易云音乐网页端Cookie中MUSIC_U对应的值</label>
+            <label>※请输入网易云音乐网页端Cookie中MUSIC_U对应的值</label>
             <el-form-item>
               <el-button type="primary" @click="onCookieSubmit">登录</el-button>
             </el-form-item>

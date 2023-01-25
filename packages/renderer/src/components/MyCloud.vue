@@ -7,7 +7,7 @@ import {
 // import { ElMessageBox } from 'element-plus'
 import { reactive, ref, watch, onBeforeMount } from 'vue'
 import { cloudDisk, cloudDiskTrackMatch, cloudDiskTrackDelete } from '../api/cloud'
-import { fileSizeDesc } from '../utils/file'
+import { fileSizeDesc,levelDesc } from '../utils/file'
 import { getSearch } from '../api/search'
 import { useMessageStore } from '../stores/message'
 import dayjs from 'dayjs'
@@ -202,7 +202,7 @@ function onClickDelete(songItem: any) {
     </el-table-column>
     <el-table-column label="文件信息" width="100">
       <template #default="scope">
-        <div>{{ path.extname(scope.row.fileName) }}</div>
+        <div>{{ levelDesc(scope.row.simpleSong.privilege.plLevel) }}</div>
         <div>{{ fileSizeDesc(scope.row.fileSize) }}</div>
       </template>
     </el-table-column>
@@ -222,7 +222,7 @@ function onClickDelete(songItem: any) {
   <el-pagination background layout="prev, pager, next, jumper" v-if="cloud.count > cloud.limit" :total="cloud.count"
     :page-size="cloud.limit" v-model:current-page="cloud.page_index" />
 
-  <el-dialog v-model="dialogConnection" :before-close="dialogConnectionBeforeClose" title="匹配歌曲">
+  <el-dialog v-model="dialogConnection" :before-close="dialogConnectionBeforeClose" title="设置关联歌曲">
     <el-input v-model="searchTable.keyword" placeholder="Search" @keyup.enter="handleMatchSearch">
       <template #prefix>
         <el-icon class="el-input__icon">

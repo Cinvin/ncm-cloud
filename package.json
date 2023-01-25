@@ -26,9 +26,9 @@
     "nano-staged": "^0.8.0",
     "simple-git-hooks": "^2.7.0",
     "typescript": "^4.6.4",
-    "unplugin-auto-import": "^0.10.2",
-    "unplugin-icons": "^0.14.7",
-    "unplugin-vue-components": "^0.21.2",
+    "unplugin-auto-import": "^0.7.1",
+    "unplugin-icons": "^0.14.3",
+    "unplugin-vue-components": "^0.19.5",
     "vite": "^2.9.8",
     "vite-plugin-electron": "^0.4.3",
     "vite-plugin-resolve": "^2.0.8",
@@ -47,12 +47,12 @@
     "vue"
   ],
   "dependencies": {
-    "@element-plus/icons-vue": "^2.0.6",
+    "@element-plus/icons-vue": "^1.1.4",
     "crypto-js": "^4.1.1",
     "dayjs": "^1.11.2",
-    "element-plus": "^2.2.11",
+    "element-plus": "^2.2.28",
     "js-cookie": "^3.0.1",
-    "NeteaseCloudMusicApi": "^4.6.7",
+    "NeteaseCloudMusicApi": "^4.5.14",
     "pinia": "^2.0.14",
     "vue-router": "^4.0.15"
   }
