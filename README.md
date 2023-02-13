@@ -4,7 +4,7 @@
 * 本地上传文件
 * 咪咕音源上传  (按歌手或按专辑批量上传)
   
-### [Releases](https://github.com/Cinvin/ncm-cloud/releases) 页面可下载MAC安装包
+### [Releases](https://github.com/Cinvin/ncm-cloud/releases) 页面可下载安装包
 
 ## 截图
 ![我的云盘](https://raw.githubusercontent.com/Cinvin/ncm-cloud/master/screenshots/MyCloud.png)  

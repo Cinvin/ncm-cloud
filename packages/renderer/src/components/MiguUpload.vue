@@ -289,6 +289,9 @@ function handleTask(taskIndex: number, poolIndex = 0) {
 
   return axios.get(task.miguURL,
     {
+      headers: {
+        'Content-type':'multipart/form-data'
+      },
       responseType: "blob",
       onDownloadProgress: (progressEvent) => {
         if (progressEvent.lengthComputable) {

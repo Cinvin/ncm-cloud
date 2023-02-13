@@ -1,6 +1,6 @@
 {
   "name": "ncm-cloud",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "main": "dist/main/index.cjs",
   "author": "Cinvin",
   "license": "MIT",
