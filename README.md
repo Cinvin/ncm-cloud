@@ -7,9 +7,9 @@
 ### [Releases](https://github.com/Cinvin/ncm-cloud/releases) 页面可下载安装包
 
 ## 截图
-![我的云盘](https://raw.githubusercontent.com/Cinvin/ncm-cloud/master/screenshots/MyCloud.png)  
-![本地上传](https://raw.githubusercontent.com/Cinvin/ncm-cloud/master/screenshots/LocalUpload.png)
-![咪咕上传](https://raw.githubusercontent.com/Cinvin/ncm-cloud/master/screenshots/MiguUpload.png "可上传周杰伦") 
+![我的云盘](https://raw.githubusercontent.com/Cinvin/ncm-cloud/master/public/MyCloud.png)  
+![本地上传](https://raw.githubusercontent.com/Cinvin/ncm-cloud/master/public/Upload.png)
+![咪咕上传](https://raw.githubusercontent.com/Cinvin/ncm-cloud/master/public/miguUpload.png "可上传周杰伦") 
 
 ## 参考和使用
 

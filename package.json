@@ -35,13 +35,13 @@
     "vue-tsc": "^1.0.24"
   },
   "dependencies": {
+    "@types/qrcode": "^1.4.2",
     "@element-plus/icons-vue": "^2.0.10",
     "axios": "^0.26.1",
     "dayjs": "^1.11.7",
     "element-plus": "^2.2.30",
     "NeteaseCloudMusicApi": "^4.8.9",
     "pinia": "^2.0.30",
-    "qrcode": "^1.5.1",
     "vue-router": "^4.1.6"
   }
 }
