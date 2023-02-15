@@ -252,26 +252,14 @@ function handleTasks() {
     datas.push({ncmSongId:item.ncmSongId,miguURL:item.miguURL,songName:item.songName,fileType:item.fileType,isInCloud:item.isInCloud,status:item.status,sort:item.sort})
     });
   ipcRenderer.send('upload-files', { data: datas, cookie: `MUSIC_U=${getCookie('MUSIC_U')};` })
-  ipcRenderer.on('task-status', (_event, task) => {
-    taskList.data.forEach(item => {
-      if (item.ncmSongId == task.ncmSongId) {
-        item.status = task.status
-        item.sort = task.sort
-        return
-      }
-    });
-  })
-  ipcRenderer.once('task-finnsh', (_event, val) => {
-    statusDesc.value = ''
-    working.value = false
-  })
 }
 function handleReTryTask(taskItem: any) {
   statusDesc.value = '下载上传ing'
   working.value = true
   let datas =[{ncmSongId:taskItem.ncmSongId,miguURL:taskItem.miguURL,songName:taskItem.songName,fileType:taskItem.fileType,isInCloud:taskItem.isInCloud,status:taskItem.status,sort:taskItem.sort}]
   ipcRenderer.send('upload-files', { data: datas, cookie: `MUSIC_U=${getCookie('MUSIC_U')};`})
-  ipcRenderer.on('task-status', (_event, task) => {
+}
+ipcRenderer.on('task-status', (_event, task) => {
     taskList.data.forEach(item => {
       if (item.ncmSongId == task.ncmSongId) {
         item.status = task.status
@@ -279,11 +267,10 @@ function handleReTryTask(taskItem: any) {
       }
     });
   })
-  ipcRenderer.once('task-finnsh', (_event, val) => {
+  ipcRenderer.on('task-finnsh', (_event, val) => {
     statusDesc.value = ''
     working.value = false
   })
-}
 </script>
 
 <template>
