@@ -1,6 +1,6 @@
 {
   "name": "ncm-cloud",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "main": "dist-electron/main/index.js",
   "description": "网易云云盘管理",
   "author": "cinvin",
@@ -25,9 +25,11 @@
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^4.0.0",
-    "electron": "^22.0.3",
+    "electron": "^15.5.7",
     "electron-builder": "^23.6.0",
     "typescript": "^4.9.4",
+    "unplugin-auto-import": "^0.14.3",
+    "unplugin-vue-components": "^0.24.0",
     "vite": "^4.0.4",
     "vite-plugin-electron": "^0.11.1",
     "vite-plugin-electron-renderer": "^0.11.4",
@@ -37,7 +39,7 @@
   "dependencies": {
     "@element-plus/icons-vue": "^2.0.10",
     "@types/qrcode": "^1.4.2",
-    "axios": "0.26.1",
+    "axios": "^0.26.1",
     "dayjs": "^1.11.7",
     "element-plus": "^2.2.30",
     "NeteaseCloudMusicApi": "^4.8.9",

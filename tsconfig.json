@@ -13,7 +13,7 @@
     "skipLibCheck": true,
     "noEmit": true
   },
-  "include": ["src"],
+  "include": ["src","element-plus.d.ts"],
   "references": [
     { "path": "./tsconfig.node.json" }
   ]

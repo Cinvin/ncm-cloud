@@ -4,15 +4,13 @@ import {
   Delete,
   Search,
 } from '@element-plus/icons-vue'
- import { ElMessageBox } from 'element-plus'
+// import { ElMessageBox } from 'element-plus'
 import { reactive, ref, watch, onBeforeMount } from 'vue'
 import { cloudDisk, cloudDiskTrackMatch, cloudDiskTrackDelete } from '../api/cloud'
 import { fileSizeDesc,levelDesc } from '../utils/file'
 import { getSearch } from '../api/search'
 import { useMessageStore } from '../stores/message'
 import dayjs from 'dayjs'
-import path from 'path'
-let MessageStore = useMessageStore()
 let cloud = reactive({
   data: [],
   count: 0,

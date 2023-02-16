@@ -1,9 +1,6 @@
 <script setup lang="ts">
 import { Upload } from '@element-plus/icons-vue'
 import { reactive } from 'vue'
-import fs from 'fs'
-import path from 'path'
-import { isAudio } from '../utils/file'
 import { uploadSong,cloudDiskTrackMatch } from '../api/cloud'
 import { getstrictSearch } from '../api/search'
 import { useMessageStore } from '../stores/message'

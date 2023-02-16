@@ -187,7 +187,9 @@ function dealSongName(songName: string) {
 			songName = splits[0]
 		}
 	}
-
+	if(songName.startsWith('《') && songName.indexOf('》')>0){
+		songName=songName.substring(1,songName.indexOf('》'))
+	}
 	songName = songName
 		// .replace('(Live版)', '(Live)')
 		// .replace('（Live）', '(Live)')
