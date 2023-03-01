@@ -43,7 +43,7 @@
     "dayjs": "^1.11.7",
     "element-plus": "^2.2.30",
     "NeteaseCloudMusicApi": "^4.8.9",
-    "pinia": "^2.0.30",
+    "pinia": "^2.0.32",
     "vue-router": "^4.1.6"
   }
 }
